@@ -1,0 +1,210 @@
+# Poz kutuphanesi - Cevre, Sehircilik ve Iklim Degisikligi Bakanligi formatina uyumlu.
+# birim_fiyat alanlari ornek/yakalsim degerleridir; gercek projede yillik bakanlik
+# birim fiyat yayinlamasinin import edilmesi onerilir.
+pozlar:
+  # === DOSEME KAPLAMALARI ===
+  "15.400.1013":
+    kategori: DOSEME
+    tanim: "Terrazo Doseme Kaplamasi"
+    birim: m2
+    birim_fiyat: 850.0
+  "15.385.1026":
+    kategori: DOSEME
+    tanim: "45x45 Renkli Sirli Porselen Karo Doseme Kaplamasi"
+    birim: m2
+    birim_fiyat: 620.0
+  "15.385.1028":
+    kategori: DOSEME
+    tanim: "60x60 Renkli Sirli Porselen Karo Doseme Kaplamasi"
+    birim: m2
+    birim_fiyat: 720.0
+  "15.490.1003":
+    kategori: DOSEME
+    tanim: "Laminat Yer Kaplamasi Yapilmasi"
+    birim: m2
+    birim_fiyat: 480.0
+  "V.1870/001":
+    kategori: DOSEME
+    tanim: "Hali Kaplama"
+    birim: m2
+    birim_fiyat: 540.0
+  "15.410.1313/A1":
+    kategori: DOSEME
+    tanim: "Burdur Bej Mermer Basamak Kaplamasi"
+    birim: m2
+    birim_fiyat: 1280.0
+  "15.410.1113/A1":
+    kategori: DOSEME
+    tanim: "Burdur Bej Mermer Doseme Kaplamasi"
+    birim: m2
+    birim_fiyat: 1180.0
+  "15.250.1011":
+    kategori: DOSEME
+    tanim: "200kg Cimento Dozlu Tesviye Tabakasi"
+    birim: m2
+    birim_fiyat: 95.0
+  "15.250.1111":
+    kategori: DOSEME
+    tanim: "2.5cm 400kg Cimento Dozlu Sap"
+    birim: m2
+    birim_fiyat: 120.0
+  "15.270.1008":
+    kategori: DOSEME
+    tanim: "Cimento Esasli Su Yalitimi"
+    birim: m2
+    birim_fiyat: 165.0
+
+  # === SUPURGELIK ===
+  "15.405.1701":
+    kategori: SUPURGELIK
+    tanim: "Terrazo Supurgelik"
+    birim: m
+    birim_fiyat: 95.0
+  "15.410.1203":
+    kategori: SUPURGELIK
+    tanim: "Mermer Supurgelik"
+    birim: m
+    birim_fiyat: 145.0
+  "15.495.1001":
+    kategori: SUPURGELIK
+    tanim: "Ahsap Supurgelik"
+    birim: m
+    birim_fiyat: 110.0
+
+  # === DUVAR KAPLAMALARI ===
+  "15.380.1057":
+    kategori: DUVAR
+    tanim: "30x45 Renkli Seramik Duvar Kaplamasi"
+    birim: m2
+    birim_fiyat: 480.0
+  "15.385.1070":
+    kategori: DUVAR
+    tanim: "Pors. Karo Duvar Kapl. (30x60) (h:120cm)"
+    birim: m2
+    birim_fiyat: 580.0
+  "15.410.1213/A":
+    kategori: DUVAR
+    tanim: "Burdur Bej Mermer Duvar Kaplama (h:120cm)"
+    birim: m2
+    birim_fiyat: 1320.0
+  "15.275.1116":
+    kategori: DUVAR
+    tanim: "Kaba Siva"
+    birim: m2
+    birim_fiyat: 75.0
+  "15.280.1010":
+    kategori: DUVAR
+    tanim: "Peritli Siva"
+    birim: m2
+    birim_fiyat: 95.0
+  "15.280.1011":
+    kategori: DUVAR
+    tanim: "Saten Alci"
+    birim: m2
+    birim_fiyat: 65.0
+  "15.280.1011/A":
+    kategori: TAVAN
+    tanim: "Saten Alci (3mm) Tavan"
+    birim: m2
+    birim_fiyat: 70.0
+  "15.540.1531":
+    kategori: DUVAR
+    tanim: "Iki Kat Su Bazli Yarimat Boya"
+    birim: m2
+    birim_fiyat: 55.0
+  "15.530.1005":
+    kategori: DUVAR
+    tanim: "Alcipanel Duvar (cift Tarafli)"
+    birim: m2
+    birim_fiyat: 280.0
+
+  # === TAVAN KAPLAMALARI ===
+  "15.535.1025":
+    kategori: TAVAN
+    tanim: "60x60cm Aluminyum Asma Tavan (Deliksiz)"
+    birim: m2
+    birim_fiyat: 460.0
+  "15.535.1027":
+    kategori: TAVAN
+    tanim: "60x60cm Aluminyum Asma Tavan (Akustik-Delikli)"
+    birim: m2
+    birim_fiyat: 510.0
+  "15.530.1908":
+    kategori: TAVAN
+    tanim: "Alcipanel Asma Tavan (Suya ve Yangina Dayanikli)"
+    birim: m2
+    birim_fiyat: 320.0
+  "15.275.1113":
+    kategori: TAVAN
+    tanim: "Tavan Sivasi"
+    birim: m2
+    birim_fiyat: 78.0
+  "15.540.1523":
+    kategori: TAVAN
+    tanim: "Iki Kat Su Bazli Mat Boya"
+    birim: m2
+    birim_fiyat: 52.0
+
+  # === DOGRAMA ===
+  "15.430.1104":
+    kategori: DOGRAMA
+    tanim: "Ahsap Ic Kapi (komple set)"
+    birim: m2
+    birim_fiyat: 1450.0
+  "15.430.1201":
+    kategori: DOGRAMA
+    tanim: "Aluminyum Pencere (sabit + acilir)"
+    birim: m2
+    birim_fiyat: 1850.0
+  "15.185.1014":
+    kategori: DOGRAMA
+    tanim: "Camli Cephe Aluminyum Dograma"
+    birim: m2
+    birim_fiyat: 2350.0
+
+  # === KABUK / TEMEL (ornek) ===
+  "15.150.1008":
+    kategori: KABUK
+    tanim: "Radye Temel (Statik Proje Esastir)"
+    birim: m3
+    birim_fiyat: 4200.0
+  "15.150.1004":
+    kategori: KABUK
+    tanim: "Grobeton (15cm) C 20/25"
+    birim: m3
+    birim_fiyat: 2250.0
+  "15.150.1003":
+    kategori: KABUK
+    tanim: "Grobeton C16/20"
+    birim: m3
+    birim_fiyat: 2100.0
+  "15.245.1001":
+    kategori: KABUK
+    tanim: "Geotekstil Kece"
+    birim: m2
+    birim_fiyat: 35.0
+  "15.255.1006":
+    kategori: KABUK
+    tanim: "3mm Elastomer Esasli Su Yalitim Membrani"
+    birim: m2
+    birim_fiyat: 145.0
+  "15.335.1303":
+    kategori: KABUK
+    tanim: "Isi Yalitimi (XPS) 5cm"
+    birim: m2
+    birim_fiyat: 165.0
+  "15.125.1009":
+    kategori: KABUK
+    tanim: "Stabilize Dolgu"
+    birim: m3
+    birim_fiyat: 580.0
+  "15.125.1010":
+    kategori: KABUK
+    tanim: "Temel Alti Sikistirilmis Cakil 10cm"
+    birim: m2
+    birim_fiyat: 65.0
+  "15.160.1002":
+    kategori: KABUK
+    tanim: "Hasir Celik (Grobeton icinde)"
+    birim: kg
+    birim_fiyat: 38.0

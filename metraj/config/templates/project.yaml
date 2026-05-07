@@ -1,0 +1,12 @@
+proje_adi: "Yeni Proje"
+
+# Kat semasi -- her projeye gore degistirilir.
+# kot_alt / kot_ust DWG'deki Z koordinatlari ile eslesmeli (mahal etiketinde
+# kat kodu ayrica yazildiginda bu sema yedek kalir).
+katlar:
+  - {kod: "Z", ad: "Zemin", kot_alt: -0.5, kot_ust: 4.0}
+  - {kod: "1", ad: "1. Kat", kot_alt: 4.0, kot_ust: 8.0}
+
+duvar_yukseklik_bantlari: [0.10, 0.15, 0.20, 0.25, 0.30]
+kapi_yuvarlama_cm: 5.0
+pencere_yuvarlama_cm: 5.0

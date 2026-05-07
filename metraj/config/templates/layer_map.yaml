@@ -1,0 +1,34 @@
+# Katman -> rol mapleme sablonu.
+# Bos birakilmis sekliyle araclar otomatik tespit (autodetect) yapar; gercek
+# proje ile esleyen katmanlar inventory komutu ile bulunabilir:
+#     python -m metraj.cli inventory <proje.dxf>  --autodetect-layers
+roles:
+  wall:
+    layers: [A-WALL, A-WALL-FULL, DUVAR, M-WALL, MIM-DUVAR, T-DUVAR, S-WALL]
+  wall_partition:
+    layers: [A-WALL-PRHT, A-WALL-PART, BOLME-DUVAR, IC-DUVAR]
+  room_label:
+    layers: [A-AREA-IDEN, A-ROOM, A-ANNO-AREA, MAHAL-KOD, MAHAL-AD,
+             A-ROOM-IDEN, MAHAL-ETIKET, OD-NO]
+  room_boundary:
+    layers: [A-AREA, A-AREA-BDRY, MAHAL-SINIR, MAHAL]
+  door:
+    layers: [A-DOOR, A-DOOR*, KAPI, M-KAPI, T-KAPI, A-DOOR-FULL]
+  window:
+    layers: [A-GLAZ, A-GLAZ*, PENCERE, M-PENCERE, T-PENCERE, A-WINDOW]
+  opening_internal:
+    layers: [A-OPNG, IC-ACIKLIK, INT-OPENING]
+  hatch_floor:
+    layers: [A-FLOR-HATC, DOSEME-HATCH, M-DOSEME-DESEN, FLOOR-HATCH]
+  column:
+    layers: [A-COLS, KOLON, M-KOLON, S-COLS]
+  stair:
+    layers: [A-FLOR-STRS, MERDIVEN, A-STAIR]
+  shaft:
+    layers: [A-SHAFT, SAFT, A-FLOR-RISR]
+  furniture:
+    layers: [A-FURN, MOBILYA, A-EQPM]
+  text_height:
+    layers: [A-ANNO-DIMS, A-ANNO, OLCU]
+  grid:
+    layers: [A-GRID, S-GRID, AKS]

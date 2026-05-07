@@ -1,0 +1,106 @@
+Referans: /Users/bts-ist-3583/Downloads/metraj/ornekRef/kumluca kaba.xlsx
+Esik (rtol): 0.01
+KALIP max rel sapma: 107.0026%
+BETON max rel sapma: 173.9725%
+Uyari satiri: 100
+
+[KALIP] Hesapta var, referansta yok: 0,00 BOSLUK YAN KALIPLARI
+[KALIP] 0,00 DOSEME: hesap=261.9700 ref=266.0800 (rel=1.54%)
+[KALIP] Hesapta var, referansta yok: 0,00 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: 0,00 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: 0,00 KIRIS BIRLESIM MINHA
+[KALIP] 0,00 KIRISLER: hesap=109.0800 ref=52.6950 (rel=107.00%)
+[KALIP] Hesapta var, referansta yok: 0,00 KOLON YERLERI MINHA
+[KALIP] Hesapta var, referansta yok: 0,00 PARAPET
+[KALIP] Referansta var, hesapta yok: 0,00 PARAPET 30 CM
+[KALIP] Hesapta var, referansta yok: +11,40 ASANSOR KULE
+[KALIP] Hesapta var, referansta yok: +11,40 BOSLUK YAN KALIPLARI
+[KALIP] +11,40 DOSEME: hesap=284.4393 ref=288.4400 (rel=1.39%)
+[KALIP] Hesapta var, referansta yok: +11,40 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: +11,40 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: +11,40 KIRIS BIRLESIM MINHA
+[KALIP] +11,40 KIRISLER: hesap=65.1600 ref=119.8800 (rel=45.65%)
+[KALIP] Hesapta var, referansta yok: +11,40 KOLON YERLERI MINHA
+[KALIP] Hesapta var, referansta yok: +11,40 PARAPET
+[KALIP] Referansta var, hesapta yok: 12,00 PARAPET 110 CM
+[KALIP] Referansta var, hesapta yok: 12,00 PARAPET 30 CM
+[KALIP] Hesapta var, referansta yok: CATI ASANSOR KULE
+[KALIP] Hesapta var, referansta yok: CATI BOSLUK YAN KALIPLARI
+[KALIP] CATI DOSEME: hesap=199.6352 ref=197.4000 (rel=1.13%)
+[KALIP] Hesapta var, referansta yok: CATI DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: CATI DOSEME YAN
+[KALIP] Referansta var, hesapta yok: 15,00 KİRİŞLER
+[KALIP] Hesapta var, referansta yok: CATI PARAPET
+[KALIP] Referansta var, hesapta yok: 15,00 PARAPET 110 CM
+[KALIP] Hesapta var, referansta yok: +2,85 BOSLUK YAN KALIPLARI
+[KALIP] +2,85 DOSEME: hesap=251.9050 ref=256.0200 (rel=1.61%)
+[KALIP] Hesapta var, referansta yok: +2,85 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: +2,85 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: +2,85 KIRIS BIRLESIM MINHA
+[KALIP] +2,85 KIRISLER: hesap=109.0800 ref=119.8800 (rel=9.01%)
+[KALIP] Hesapta var, referansta yok: +2,85 KOLON YERLERI MINHA
+[KALIP] +2,85 PARAPET: hesap=6.0000 ref=5.8200 (rel=3.09%)
+[KALIP] Hesapta var, referansta yok: +5,70 BOSLUK YAN KALIPLARI
+[KALIP] +5,70 DOSEME: hesap=251.9050 ref=256.0200 (rel=1.61%)
+[KALIP] Hesapta var, referansta yok: +5,70 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: +5,70 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: +5,70 KIRIS BIRLESIM MINHA
+[KALIP] +5,70 KIRISLER: hesap=109.0800 ref=119.8800 (rel=9.01%)
+[KALIP] Hesapta var, referansta yok: +5,70 KOLON YERLERI MINHA
+[KALIP] +5,70 PARAPET: hesap=6.0000 ref=5.8200 (rel=3.09%)
+[KALIP] Hesapta var, referansta yok: +8,55 BOSLUK YAN KALIPLARI
+[KALIP] +8,55 DOSEME: hesap=251.9050 ref=256.0200 (rel=1.61%)
+[KALIP] Hesapta var, referansta yok: +8,55 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: +8,55 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: +8,55 KIRIS BIRLESIM MINHA
+[KALIP] +8,55 KIRISLER: hesap=109.0800 ref=119.8800 (rel=9.01%)
+[KALIP] Hesapta var, referansta yok: +8,55 KOLON YERLERI MINHA
+[KALIP] Referansta var, hesapta yok: 9,00 PARAPET
+[KALIP] Referansta var, hesapta yok: 90 CM BACALAR
+[KALIP] Referansta var, hesapta yok: ASANSÖR KULE
+[KALIP] Referansta var, hesapta yok: ASANSÖR KULE DÖŞEME
+[KALIP] Referansta var, hesapta yok: ASANSÖR KULE PARAPET 50 CM
+[KALIP] Referansta var, hesapta yok: BOŞLUK YAN KALIPLARI
+[KALIP] Referansta var, hesapta yok: DÖŞEME BOŞLUK MİNHA
+[KALIP] Referansta var, hesapta yok: DÖŞEME YAN
+[KALIP] GROBETON: hesap=20.0920 ref=9.9460 (rel=102.01%)
+[KALIP] Referansta var, hesapta yok: KİRİŞ BİRLEŞİMLERİ MİNHA
+[KALIP] Referansta var, hesapta yok: KOLON PERDE BİRLEŞİM MİNHA
+[KALIP] Referansta var, hesapta yok: KOLON YERLERİ MİNHA
+[KALIP] Referansta var, hesapta yok: PERDE PERDE BİRLEŞİM MİNHA
+[KALIP] TEMEL: hesap=99.6600 ref=49.3300 (rel=102.03%)
+[BETON] 0,00 DOSEME: hesap=39.2955 ref=40.5390 (rel=3.07%)
+[BETON] Hesapta var, referansta yok: 0,00 DOSEME BOSLUK MINHA
+[BETON] 0,00 KIRISLER: hesap=16.3619 ref=7.1055 (rel=130.27%)
+[BETON] Hesapta var, referansta yok: 0,00 PARAPET
+[BETON] Referansta var, hesapta yok: 0,00 PARAPET 30 CM
+[BETON] Hesapta var, referansta yok: +11,40 ASANSOR KULE
+[BETON] +11,40 DOSEME: hesap=42.6659 ref=43.2660 (rel=1.39%)
+[BETON] Hesapta var, referansta yok: +11,40 DOSEME BOSLUK MINHA
+[BETON] +11,40 KIRISLER: hesap=9.7739 ref=16.3620 (rel=40.26%)
+[BETON] Hesapta var, referansta yok: +11,40 PARAPET
+[BETON] Referansta var, hesapta yok: 12,00 PARAPET 110 CM
+[BETON] Referansta var, hesapta yok: 12,00 PARAPET 30 CM
+[BETON] Referansta var, hesapta yok: ÇATI
+[BETON] Hesapta var, referansta yok: CATI ASANSOR KULE
+[BETON] CATI DOSEME: hesap=29.9453 ref=29.6100 (rel=1.13%)
+[BETON] Hesapta var, referansta yok: CATI DOSEME BOSLUK MINHA
+[BETON] Referansta var, hesapta yok: 15,00 KİRİŞLER
+[BETON] Hesapta var, referansta yok: CATI PARAPET
+[BETON] Referansta var, hesapta yok: 15,00 PARAPET 110 CM
+[BETON] +2,85 DOSEME: hesap=37.7857 ref=38.4030 (rel=1.61%)
+[BETON] Hesapta var, referansta yok: +2,85 DOSEME BOSLUK MINHA
+[BETON] +2,85 PARAPET: hesap=1.2000 ref=0.4380 (rel=173.97%)
+[BETON] +5,70 DOSEME: hesap=37.7857 ref=38.4030 (rel=1.61%)
+[BETON] Hesapta var, referansta yok: +5,70 DOSEME BOSLUK MINHA
+[BETON] +5,70 PARAPET: hesap=1.2000 ref=0.4380 (rel=173.97%)
+[BETON] +8,55 DOSEME: hesap=37.7857 ref=38.4030 (rel=1.61%)
+[BETON] Hesapta var, referansta yok: +8,55 DOSEME BOSLUK MINHA
+[BETON] Referansta var, hesapta yok: 9,00 PARAPET
+[BETON] Referansta var, hesapta yok: 90 CM BACALAR
+[BETON] Referansta var, hesapta yok: ASANSÖR KULE
+[BETON] Referansta var, hesapta yok: ASANSÖR KULE DÖŞEME
+[BETON] Referansta var, hesapta yok: ASANSÖR KULE PARAPET 50 CM
+[BETON] Referansta var, hesapta yok: DÖŞEME BOŞLUK MİNHA
+[BETON] Referansta var, hesapta yok: GRO
+[BETON] Referansta var, hesapta yok: KORUMA

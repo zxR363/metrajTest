@@ -1,0 +1,216 @@
+Metadata-Version: 2.4
+Name: metraj
+Version: 0.1.0
+Summary: AutoCAD DWG/DXF tabanli mimari metraj otomasyonu
+Author: Metraj Otomasyon
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: ezdxf>=1.4.0
+Requires-Dist: shapely>=2.0
+Requires-Dist: networkx>=3.2
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: openpyxl>=3.1
+Requires-Dist: rtree>=1.1
+Requires-Dist: reportlab>=4.0
+Provides-Extra: gui
+Requires-Dist: PySide6>=6.6; extra == "gui"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4; extra == "dev"
+
+# Metraj — AutoCAD Tabanlı Mimari Metraj Otomasyonu
+
+İnşaat firmalarının AutoCAD DWG/DXF mimari çizimlerinden mahal listesi,
+kapı/pencere doğrama, duvar/kabuk imalatları ve poz icmal raporlarını
+otomatik üreten bağımsız masaüstü uygulaması.
+
+Bu repo, [Metraj Otomasyon Aracı — Analiz Raporu ve Yol Haritası](.cursor/plans/)
+planında tanımlanan 6 fazlı yol haritasının çalıştırılabilir referans
+uygulamasıdır.
+
+## Hızlı başlangıç
+
+```bash
+pip install -r requirements.txt
+# veya: pip install -e .[gui,dev]
+```
+
+### Hedef: Her projede çalışsın
+
+Sistem tamamen **proje-agnostiktir**. Yeni bir proje için tek seferlik
+3 adım yeterli:
+
+```bash
+# 1) Yeni proje icin konfigurasyon klasoru olustur
+python -m metraj.cli new-project ./projeler/yeni_konut --proje-adi "Konut A"
+
+# 2) DWG/DXF dosyasini analiz et: sistem katman isimlerini otomatik tahmin
+#    edip layer_map.yaml'a yazar (T-DUVAR/T-KAPI/A-WALL/A-DOOR vs.)
+python -m metraj.cli inventory --autodetect-layers \
+    --write-layer-map ./projeler/yeni_konut/layer_map.yaml \
+    proje.dxf
+
+# 3) Pipeline'i calistir
+python -m metraj.cli --config ./projeler/yeni_konut run proje.dxf -o build/
+```
+
+3. adımdan sonra eğer firma kendi tip standardını (`DS1..DS6`, `Z1..Z4`,
+ya da ne ise) kullanıyorsa, `./projeler/yeni_konut/tip_definitions.yaml`
+dosyasında `D1/W1/T1` şablonlarını bunlarla değiştirir; eksik tip ve poz
+kodları varsa CLI çıktısı bunu raporlar.
+
+### Diğer komutlar
+
+DXF dosyası üzerinde tam pipeline (varsayılan iç konfigle):
+
+```bash
+python -m metraj.cli run path/to/proje.dxf -o build/
+```
+
+Katman/blok envanter raporu (Faz 0 PoC):
+
+```bash
+python -m metraj.cli inventory path/to/proje.dxf --json envanter.json
+```
+
+Mevcut firma Excel'i ile karşılaştırma:
+
+```bash
+python -m metraj.cli compare path/to/proje.dxf "YM-K-Amfi Mahal Metraj_R22.xlsx"
+```
+
+Grafiksel arayüz (PySide6 gerekli):
+
+```bash
+python -m metraj.cli ui
+```
+
+## DWG desteği
+
+DWG ikili formatı kapalı olduğu için **ODA File Converter** (ücretsiz)
+binary'sinin sistemde yüklü olması gerekir:
+<https://www.opendesign.com/guestfiles/oda_file_converter>
+
+Yüklü değilse araç DXF dosyalarını doğrudan kabul eder. AutoCAD veya
+BricsCAD'dan `Save As → DXF` ile çıkarılabilir.
+
+## Mimari (özet)
+
+```
+metraj/
+  app/              # PySide6 ana pencere ve 2D plan göruntuleyici
+  cli.py            # Komut satırı
+  pipeline.py       # Üst seviye orkestrasyon
+  core/
+    cad_io/         # DWG→DXF, DXF okuyucu (ezdxf)
+    mapping/        # YAML konfig (layer/poz/tip/proje)
+    rooms/          # 3 fallback'li mahal sınırı tespiti
+    openings/       # Kapı/pencere blok analizi, minha
+    walls/          # Duvar polyline -> uzunluk/tip/yükseklik
+    quantities/     # Net alan/çevre hesabı, minha düşümleri
+    pozlar/         # Tip → poz dağıtımı, icmal aggregator
+    excel/          # openpyxl çıktı yazıcısı + groundtruth okuyucu
+    reports/        # ReportLab PDF + revizyon karşılaştırma
+  config/
+    layer_map.yaml
+    poz_library.yaml
+    tip_definitions.yaml
+    project.yaml
+  tests/            # Sentetik DXF fixture + entegrasyon testleri
+```
+
+## Konfigürasyon dosyaları
+
+Sistem dört YAML konfig dosyası ile yönetilir:
+
+- **`layer_map.yaml`** — DWG katmanlarını semantik rollere bağlar
+  (`A-WALL → wall`, `A-DOOR → door` …). Wildcard desteklenir, autodetect
+  ile boş gelse de pipeline çalışır.
+- **`poz_library.yaml`** — Çevre, Şehircilik ve İklim Değişikliği Bakanlığı
+  birim fiyat formatına uyumlu poz kütüphanesi (poz no, kategori, tanım,
+  birim, birim fiyat).
+- **`tip_definitions.yaml`** — Mahal tip kodlarının (firmanıza göre
+  `D1/W1/T1` veya `DŞ1/DV4/TV2` ya da `Z1/D1/T1` …) poz reçeteleri
+  (yüzde dağılımlı).
+- **`project.yaml`** — proje seviyesi: kat şeması (kotlar), yükseklik
+  bantları, yuvarlama hassasiyetleri.
+
+### Konfigürasyon kaynakları
+
+```
+metraj/config/
+├── layer_map.yaml         # default (genis Turk + AIA katman listesi)
+├── poz_library.yaml       # default (CSB poz orneklenmesi)
+├── tip_definitions.yaml   # default (referans projenin DS/DV/TV kodlari)
+├── project.yaml           # default (Varsayilan Proje, jenerik kat semasi)
+└── templates/             # `new-project` icin sablonlar (sıfırdan basla)
+    ├── layer_map.yaml     # bos -> autodetect doldurur
+    ├── poz_library.yaml   # 11 jenerik poz
+    ├── tip_definitions.yaml  # D1/W1/T1/S1 jenerik kod kumesi
+    └── project.yaml       # 2 katli sade sema
+```
+
+`--config <yol>` ile herhangi bir klasor secebilirsiniz. Pipeline
+calismakta kalir:
+- Eslesmemis katman varsa autodetect heuristikle role atar (uyari verir).
+- Tip kodu konfigde tanimsizsa `config_gaps` raporu yazılır, o tipin pozları atlanir, baska tipler hesaba katilmaya devam eder.
+- Birim fiyat 0 olan poz keşif tutarına 0 olarak gelir; Bakanlık birim
+  fiyatı yıllık güncellenebilir.
+
+### Otomatik katman tanıma
+
+Sistem 14 desen tabanlı kuralla şu rolleri tanır:
+
+| Rol | Tanınan örnekler |
+|---|---|
+| `wall` | `A-WALL`, `DUVAR`, `T-DUVAR`, `MIM-DUVAR`, `S-WALL` |
+| `door` | `A-DOOR`, `KAPI`, `T-KAPI`, `M-KAPI` |
+| `window` | `A-GLAZ`, `PENCERE`, `T-PENCERE` |
+| `room_label` | `A-AREA-IDEN`, `MAHAL-ETIKET`, `OD-NO`, `A-ROOM` |
+| `column` | `A-COLS`, `KOLON`, `S-COLS` |
+| `stair`, `shaft`, `furniture`, `grid`, `text_height` … | (tam liste: `metraj/core/mapping/autodetect.py`) |
+
+Eslemeyen katmanlar varsa `inventory --autodetect-layers` çıktısında
+"unmatched_layers" listesinde gösterilir; manuel olarak
+`layer_map.yaml`'a eklenebilir.
+
+## Pipeline
+
+```mermaid
+flowchart LR
+    DWG[DWG/DXF] --> Convert[ODA + ezdxf]
+    Convert --> Model[RawCadModel]
+    Model --> Rooms[Mahal Sınırı]
+    Model --> Open[Kapi/Pencere]
+    Model --> Walls[Duvar segment]
+    Rooms --> Qty[Net Metraj]
+    Open --> Qty
+    Qty --> Icmal[Icmal Aggregator]
+    Icmal --> Excel[Excel R22]
+    Icmal --> Pdf[PDF Ozet]
+```
+
+## Test çalıştırma
+
+```bash
+pytest metraj/tests/
+```
+
+Testler sentetik bir 5 mahalden oluşan DXF fixture üretir, böylece ODA
+File Converter veya gerçek bir proje DWG'i olmadan çalışırlar.
+
+## Yol haritası
+
+Çalışan iskelete sahip 6 faz:
+
+1. **Faz 0** — Keşif & PoC (envanter aracı, ground-truth karşılaştırma) ✓
+2. **Faz 1** — CAD Veri Çıkarma (ODA wrapper, DXF reader, layer mapping) ✓
+3. **Faz 2** — Mahal Listesi (3 fallback'li detector, openings, minha) ✓
+4. **Faz 3** — Doğrama Metrajı (blok parametre çıkarımı, kat × tip × adet) ✓
+5. **Faz 4** — Duvar/Kabuk (segment çıkarımı, kalınlık bantları) ✓
+6. **Faz 5** — İcmal & Raporlama (poz aggregator, Excel + PDF, revizyon
+   diff) ✓
+7. **Faz 6** — UI/UX & Üretim (PySide6 main window, plan viewer, tablolar,
+   uyarı paneli, paketleme) ✓
+
+Her faz kendi modülünde gevşek bağlı çalışır; üretim olgunluğuna giderken
+katmanlı şekilde derinleştirilebilir.

@@ -1,0 +1,118 @@
+# Tip kodu -> poz dagilimi (1 mahalde birden cok kaplama olabilir).
+# pay alani 0..1 arasi yuzdedir; toplami 1.0 olmak zorunda degildir
+# (orn. mahalin yarisi seramik, yarisi laminat olabilir).
+tipler:
+  # === DOSEME TIPLERI ===
+  DS1:
+    kategori: DOSEME
+    tanim: "Terrazo doseme + supurgelik"
+    pozlar:
+      - {poz_no: "15.400.1013", pay: 1.0}
+      - {poz_no: "15.250.1011", pay: 1.0}
+      - {poz_no: "15.250.1111", pay: 1.0}
+
+  DS2:
+    kategori: DOSEME
+    tanim: "Mermer doseme (Burdur Bej)"
+    pozlar:
+      - {poz_no: "15.410.1113/A1", pay: 1.0}
+      - {poz_no: "15.250.1011", pay: 1.0}
+      - {poz_no: "15.250.1111", pay: 1.0}
+
+  DS3:
+    kategori: DOSEME
+    tanim: "60x60 Porselen karo (genel kullanim)"
+    pozlar:
+      - {poz_no: "15.385.1028", pay: 1.0}
+      - {poz_no: "15.250.1011", pay: 1.0}
+      - {poz_no: "15.250.1111", pay: 1.0}
+
+  DS4:
+    kategori: DOSEME
+    tanim: "45x45 Porselen karo (islak hacim)"
+    pozlar:
+      - {poz_no: "15.385.1026", pay: 1.0}
+      - {poz_no: "15.270.1008", pay: 1.0}
+      - {poz_no: "15.250.1011", pay: 1.0}
+      - {poz_no: "15.250.1111", pay: 1.0}
+
+  DS5:
+    kategori: DOSEME
+    tanim: "Laminat (ofis/calisma)"
+    pozlar:
+      - {poz_no: "15.490.1003", pay: 1.0}
+      - {poz_no: "15.250.1011", pay: 1.0}
+      - {poz_no: "15.250.1111", pay: 1.0}
+
+  DS6:
+    kategori: DOSEME
+    tanim: "Hali kaplama"
+    pozlar:
+      - {poz_no: "V.1870/001", pay: 1.0}
+      - {poz_no: "15.250.1011", pay: 1.0}
+      - {poz_no: "15.250.1111", pay: 1.0}
+
+  # === DUVAR TIPLERI ===
+  DV1:
+    kategori: DUVAR
+    tanim: "Kaba siva + saten + boya"
+    pozlar:
+      - {poz_no: "15.275.1116", pay: 1.0}
+      - {poz_no: "15.280.1011", pay: 1.0}
+      - {poz_no: "15.540.1531", pay: 1.0}
+
+  DV4:
+    kategori: DUVAR
+    tanim: "Islak hacim - seramik (h:240cm)"
+    pozlar:
+      - {poz_no: "15.275.1116", pay: 1.0}
+      - {poz_no: "15.380.1057", pay: 1.0}
+
+  DV6:
+    kategori: DUVAR
+    tanim: "Alcipanel + boya"
+    pozlar:
+      - {poz_no: "15.530.1005", pay: 1.0}
+      - {poz_no: "15.280.1011", pay: 1.0}
+      - {poz_no: "15.540.1531", pay: 1.0}
+
+  DV7:
+    kategori: DUVAR
+    tanim: "Koridor - peritli + saten + boya + porselen alt panel"
+    pozlar:
+      - {poz_no: "15.280.1010", pay: 1.0}
+      - {poz_no: "15.280.1011", pay: 1.0}
+      - {poz_no: "15.540.1531", pay: 1.0}
+      - {poz_no: "15.385.1070", pay: 0.4}  # alt 120cm
+
+  # === TAVAN TIPLERI ===
+  TV1:
+    kategori: TAVAN
+    tanim: "Sivali tavan + boya"
+    pozlar:
+      - {poz_no: "15.275.1113", pay: 1.0}
+      - {poz_no: "15.280.1011/A", pay: 1.0}
+      - {poz_no: "15.540.1523", pay: 1.0}
+
+  TV2:
+    kategori: TAVAN
+    tanim: "Asma tavan akustik aluminyum"
+    pozlar:
+      - {poz_no: "15.535.1027", pay: 1.0}
+
+  # === SUPURGELIK TIPLERI ===
+  SP_TER:
+    kategori: SUPURGELIK
+    tanim: "Terrazo supurgelik"
+    pozlar:
+      - {poz_no: "15.405.1701", pay: 1.0}
+  SP_MER:
+    kategori: SUPURGELIK
+    tanim: "Mermer supurgelik"
+    pozlar:
+      - {poz_no: "15.410.1203", pay: 1.0}
+  SP_AHS:
+    kategori: SUPURGELIK
+    tanim: "Ahsap supurgelik"
+    pozlar:
+      - {poz_no: "15.495.1001", pay: 1.0}

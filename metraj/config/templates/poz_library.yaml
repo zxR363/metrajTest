@@ -1,0 +1,68 @@
+# Poz kutuphanesi sablonu.
+# Cevre, Sehircilik ve Iklim Degisikligi Bakanligi formati.
+# Birim fiyatlar yillik bakanlik yayini ile guncellenmelidir.
+pozlar:
+  # === DOSEME ===
+  "15.385.1028":
+    kategori: DOSEME
+    tanim: "60x60 Renkli Sirli Porselen Karo Doseme Kaplamasi"
+    birim: m2
+    birim_fiyat: 720.0
+  "15.250.1011":
+    kategori: DOSEME
+    tanim: "200kg Cimento Dozlu Tesviye Tabakasi"
+    birim: m2
+    birim_fiyat: 95.0
+  "15.250.1111":
+    kategori: DOSEME
+    tanim: "2.5cm 400kg Cimento Dozlu Sap"
+    birim: m2
+    birim_fiyat: 120.0
+
+  # === DUVAR ===
+  "15.275.1116":
+    kategori: DUVAR
+    tanim: "Kaba Siva"
+    birim: m2
+    birim_fiyat: 75.0
+  "15.280.1011":
+    kategori: DUVAR
+    tanim: "Saten Alci"
+    birim: m2
+    birim_fiyat: 65.0
+  "15.540.1531":
+    kategori: DUVAR
+    tanim: "Iki Kat Su Bazli Yarimat Boya"
+    birim: m2
+    birim_fiyat: 55.0
+
+  # === TAVAN ===
+  "15.275.1113":
+    kategori: TAVAN
+    tanim: "Tavan Sivasi"
+    birim: m2
+    birim_fiyat: 78.0
+  "15.540.1523":
+    kategori: TAVAN
+    tanim: "Iki Kat Su Bazli Mat Boya"
+    birim: m2
+    birim_fiyat: 52.0
+
+  # === SUPURGELIK ===
+  "15.405.1701":
+    kategori: SUPURGELIK
+    tanim: "Terrazo Supurgelik"
+    birim: m
+    birim_fiyat: 95.0
+
+  # === DOGRAMA (jenerik) ===
+  "15.430.1104":
+    kategori: DOGRAMA
+    tanim: "Ahsap Ic Kapi (komple set)"
+    birim: m2
+    birim_fiyat: 1450.0
+  "15.430.1201":
+    kategori: DOGRAMA
+    tanim: "Aluminyum Pencere"
+    birim: m2
+    birim_fiyat: 1850.0

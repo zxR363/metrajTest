@@ -1,0 +1,46 @@
+# Katman -> rol mapleme. Bir rol birden cok katmana baglanabilir.
+# Asterisk wildcard destekli (orn. "A-DOOR*" tum A-DOOR... katmanlari yakalar).
+# AIA / Turk firmasi standartlari karisik kullanildigi icin esnek tutulmustur.
+roles:
+  wall:
+    layers: [A-WALL, A-WALL-FULL, DUVAR, A-DUVAR, M-DUVAR, M-WALL]
+    notes: "Tasiyici ve tasiyici olmayan duvarlar (3D model gerekmez, 2D yeter)."
+  wall_partition:
+    layers: [A-WALL-PRHT, A-WALL-PART, BOLME-DUVAR]
+    notes: "Bolme/alcipanel duvarlar."
+  room_label:
+    layers: [A-AREA-IDEN, A-ROOM, A-ANNO-AREA, MAHAL-KOD, MAHAL-AD, A-ROOM-IDEN]
+    notes: "Mahal kodu/ad text/MText katmani."
+  room_boundary:
+    layers: [A-AREA, A-AREA-BDRY, MAHAL-SINIR]
+    notes: "Mevcut polyline/hatch ile cizilmis mahal sinirlari (varsa direkt kullanilir)."
+  door:
+    layers: [A-DOOR, A-DOOR*, KAPI, M-KAPI, A-DOOR-FULL]
+    notes: "Kapi bloklari."
+  window:
+    layers: [A-GLAZ, A-GLAZ*, PENCERE, M-PENCERE, A-WINDOW]
+    notes: "Pencere bloklari."
+  opening_internal:
+    layers: [A-OPNG, IC-ACIKLIK, INT-OPENING]
+    notes: "Ic acikliklar (gecisli kapilar, kemerler)."
+  hatch_floor:
+    layers: [A-FLOR-HATC, DOSEME-HATCH, M-DOSEME-DESEN]
+    notes: "Doseme kaplama hatch'leri (tip atamasi yardimcisi)."
+  column:
+    layers: [A-COLS, KOLON, M-KOLON, S-COLS]
+    notes: "Kolon polyline/blogu (mahal alanindan dusulebilir)."
+  stair:
+    layers: [A-FLOR-STRS, MERDIVEN, A-STAIR]
+    notes: "Merdiven sahanligi (mahal alanindan duselsin mi opsiyonel)."
+  shaft:
+    layers: [A-SHAFT, SAFT, A-FLOR-RISR]
+    notes: "Saft / asansor bosluk."
+  furniture:
+    layers: [A-FURN, MOBILYA, A-EQPM]
+    notes: "Mobilya/ekipman (metraja girmez ama gozardi listesine eklenir)."
+  text_height:
+    layers: [A-ANNO-DIMS, A-ANNO, OLCU]
+    notes: "Cizim olculendirme."
+  grid:
+    layers: [A-GRID, S-GRID, AKS]
+    notes: "Aks cizgileri."

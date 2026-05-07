@@ -1,0 +1,156 @@
+Referans: /Users/bts-ist-3583/Downloads/metraj/ornekRef/kumluca kaba.xlsx
+Esik (rtol): 0.01
+KALIP max rel sapma: 107.0026%
+BETON max rel sapma: 360.5414%
+Uyari satiri: 150
+
+[KALIP] (-3,00)/0,00 KOLON: hesap=526.0870 ref=263.0550 (rel=99.99%)
+[KALIP] Hesapta var, referansta yok: +11,40 ASANSOR KULE
+[KALIP] Hesapta var, referansta yok: +11,40 BOSLUK YAN KALIPLARI
+[KALIP] Hesapta var, referansta yok: +11,40 DOSEME
+[KALIP] Hesapta var, referansta yok: +11,40 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: +11,40 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: +11,40 KIRIS BIRLESIM MINHA
+[KALIP] Hesapta var, referansta yok: +11,40 KIRISLER
+[KALIP] Hesapta var, referansta yok: +11,40 KOLON YERLERI MINHA
+[KALIP] Hesapta var, referansta yok: +11,40 PARAPET
+[KALIP] Hesapta var, referansta yok: +11,40/+14,40 KOTLARI ARASI KOLON
+[KALIP] Hesapta var, referansta yok: +2,85 BOSLUK YAN KALIPLARI
+[KALIP] Hesapta var, referansta yok: +2,85 DOSEME
+[KALIP] Hesapta var, referansta yok: +2,85 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: +2,85 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: +2,85 KIRIS BIRLESIM MINHA
+[KALIP] Hesapta var, referansta yok: +2,85 KIRISLER
+[KALIP] Hesapta var, referansta yok: +2,85 KOLON YERLERI MINHA
+[KALIP] Hesapta var, referansta yok: +2,85 PARAPET
+[KALIP] Hesapta var, referansta yok: +2,85/+5,85 KOTLARI ARASI KOLON
+[KALIP] Hesapta var, referansta yok: +5,70 BOSLUK YAN KALIPLARI
+[KALIP] Hesapta var, referansta yok: +5,70 DOSEME
+[KALIP] Hesapta var, referansta yok: +5,70 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: +5,70 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: +5,70 KIRIS BIRLESIM MINHA
+[KALIP] Hesapta var, referansta yok: +5,70 KIRISLER
+[KALIP] Hesapta var, referansta yok: +5,70 KOLON YERLERI MINHA
+[KALIP] Hesapta var, referansta yok: +5,70 PARAPET
+[KALIP] Hesapta var, referansta yok: +5,70/+8,70 KOTLARI ARASI KOLON
+[KALIP] Hesapta var, referansta yok: +8,55 BOSLUK YAN KALIPLARI
+[KALIP] Hesapta var, referansta yok: +8,55 DOSEME
+[KALIP] Hesapta var, referansta yok: +8,55 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: +8,55 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: +8,55 KIRIS BIRLESIM MINHA
+[KALIP] Hesapta var, referansta yok: +8,55 KIRISLER
+[KALIP] Hesapta var, referansta yok: +8,55 KOLON YERLERI MINHA
+[KALIP] Hesapta var, referansta yok: +8,55/+11,55 KOTLARI ARASI KOLON
+[KALIP] Hesapta var, referansta yok: 0,00 BOSLUK YAN KALIPLARI
+[KALIP] 0,00 DOSEME: hesap=523.9399 ref=266.0800 (rel=96.91%)
+[KALIP] Hesapta var, referansta yok: 0,00 DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: 0,00 DOSEME YAN
+[KALIP] Hesapta var, referansta yok: 0,00 KIRIS BIRLESIM MINHA
+[KALIP] 0,00 KIRISLER: hesap=109.0800 ref=52.6950 (rel=107.00%)
+[KALIP] Hesapta var, referansta yok: 0,00 KOLON YERLERI MINHA
+[KALIP] Hesapta var, referansta yok: 0,00 PARAPET
+[KALIP] Referansta var, hesapta yok: 0,00 PARAPET 30 CM
+[KALIP] Hesapta var, referansta yok: 0,00/+3,00 KOTLARI ARASI KOLON
+[KALIP] Referansta var, hesapta yok: 0,00/3,00 KOTLARI ARASI KOLON
+[KALIP] Referansta var, hesapta yok: 12,00 DÖŞEME
+[KALIP] Referansta var, hesapta yok: 12,00 KİRİŞLER
+[KALIP] Referansta var, hesapta yok: 12,00 PARAPET 110 CM
+[KALIP] Referansta var, hesapta yok: 12,00 PARAPET 30 CM
+[KALIP] Referansta var, hesapta yok: 12,00/15,00 KOTLARI ARASI KOLON
+[KALIP] Referansta var, hesapta yok: 15,00 DÖŞEME
+[KALIP] Referansta var, hesapta yok: 15,00 KİRİŞLER
+[KALIP] Referansta var, hesapta yok: 15,00 PARAPET 110 CM
+[KALIP] Referansta var, hesapta yok: 3,00 DÖŞEME
+[KALIP] Referansta var, hesapta yok: 3,00 KİRİŞLER
+[KALIP] Referansta var, hesapta yok: 3,00 PARAPET
+[KALIP] Referansta var, hesapta yok: 3,00/6,00 KOTLARI ARASI KOLON
+[KALIP] Referansta var, hesapta yok: 6,00 DÖŞEME
+[KALIP] Referansta var, hesapta yok: 6,00 KİRİŞLER
+[KALIP] Referansta var, hesapta yok: 6,00 PARAPET
+[KALIP] Referansta var, hesapta yok: 6,00/9,00 KOTLARI ARASI KOLON
+[KALIP] Referansta var, hesapta yok: 9,00 DÖŞEME
+[KALIP] Referansta var, hesapta yok: 9,00 KİRİŞLER
+[KALIP] Referansta var, hesapta yok: 9,00 PARAPET
+[KALIP] Referansta var, hesapta yok: 9,00/12,00 KOTLARI ARASI KOLON
+[KALIP] Referansta var, hesapta yok: 90 CM BACALAR
+[KALIP] Referansta var, hesapta yok: ASANSÖR KULE
+[KALIP] Referansta var, hesapta yok: ASANSÖR KULE DÖŞEME
+[KALIP] Referansta var, hesapta yok: ASANSÖR KULE PARAPET 50 CM
+[KALIP] Referansta var, hesapta yok: BOŞLUK YAN KALIPLARI
+[KALIP] Hesapta var, referansta yok: CATI ASANSOR KULE
+[KALIP] Hesapta var, referansta yok: CATI BOSLUK YAN KALIPLARI
+[KALIP] Hesapta var, referansta yok: CATI DOSEME
+[KALIP] Hesapta var, referansta yok: CATI DOSEME BOSLUK MINHA
+[KALIP] Hesapta var, referansta yok: CATI DOSEME YAN
+[KALIP] Hesapta var, referansta yok: CATI PARAPET
+[KALIP] Referansta var, hesapta yok: DÖŞEME BOŞLUK MİNHA
+[KALIP] Referansta var, hesapta yok: DÖŞEME YAN
+[KALIP] Referansta var, hesapta yok: GRO
+[KALIP] Hesapta var, referansta yok: GROBETON
+[KALIP] Referansta var, hesapta yok: KİRİŞ BİRLEŞİMLERİ MİNHA
+[KALIP] Referansta var, hesapta yok: KOLON PERDE BİRLEŞİM MİNHA
+[KALIP] Referansta var, hesapta yok: KOLON YERLERİ MİNHA
+[KALIP] Referansta var, hesapta yok: PERDE PERDE BİRLEŞİM MİNHA
+[KALIP] TEMEL: hesap=99.6600 ref=49.3300 (rel=102.03%)
+[BETON] (-3,00)/0,00 KOLON: hesap=60.2273 ref=30.1245 (rel=99.93%)
+[BETON] (-3,00)/0,00 PERDE: hesap=97.6111 ref=48.7920 (rel=100.06%)
+[BETON] Hesapta var, referansta yok: +11,40 ASANSOR KULE
+[BETON] Hesapta var, referansta yok: +11,40 DOSEME
+[BETON] Hesapta var, referansta yok: +11,40 DOSEME BOSLUK MINHA
+[BETON] Hesapta var, referansta yok: +11,40 KIRISLER
+[BETON] Hesapta var, referansta yok: +11,40 PARAPET
+[BETON] Hesapta var, referansta yok: +11,40/+14,40 KOTLARI ARASI KOLON
+[BETON] Hesapta var, referansta yok: +2,85 DOSEME
+[BETON] Hesapta var, referansta yok: +2,85 DOSEME BOSLUK MINHA
+[BETON] Hesapta var, referansta yok: +2,85 KIRISLER
+[BETON] Hesapta var, referansta yok: +2,85 PARAPET
+[BETON] Hesapta var, referansta yok: +2,85/+5,85 KOTLARI ARASI KOLON
+[BETON] Hesapta var, referansta yok: +5,70 DOSEME
+[BETON] Hesapta var, referansta yok: +5,70 DOSEME BOSLUK MINHA
+[BETON] Hesapta var, referansta yok: +5,70 KIRISLER
+[BETON] Hesapta var, referansta yok: +5,70 PARAPET
+[BETON] Hesapta var, referansta yok: +5,70/+8,70 KOTLARI ARASI KOLON
+[BETON] Hesapta var, referansta yok: +8,55 DOSEME
+[BETON] Hesapta var, referansta yok: +8,55 DOSEME BOSLUK MINHA
+[BETON] Hesapta var, referansta yok: +8,55 KIRISLER
+[BETON] Hesapta var, referansta yok: +8,55/+11,55 KOTLARI ARASI KOLON
+[BETON] 0,00 DOSEME: hesap=78.5910 ref=40.5390 (rel=93.87%)
+[BETON] Hesapta var, referansta yok: 0,00 DOSEME BOSLUK MINHA
+[BETON] 0,00 KIRISLER: hesap=32.7238 ref=7.1055 (rel=360.54%)
+[BETON] Hesapta var, referansta yok: 0,00 PARAPET
+[BETON] Referansta var, hesapta yok: 0,00 PARAPET 30 CM
+[BETON] Hesapta var, referansta yok: 0,00/+3,00 KOTLARI ARASI KOLON
+[BETON] Referansta var, hesapta yok: 0,00/3,00 KOTLARI ARASI KOLON
+[BETON] Referansta var, hesapta yok: 12,00 DÖŞEME
+[BETON] Referansta var, hesapta yok: 12,00 KİRİŞLER
+[BETON] Referansta var, hesapta yok: 12,00 PARAPET 110 CM
+[BETON] Referansta var, hesapta yok: 12,00 PARAPET 30 CM
+[BETON] Referansta var, hesapta yok: 12,00/15,00 KOTLARI ARASI KOLON
+[BETON] Referansta var, hesapta yok: 15,00 DÖŞEME
+[BETON] Referansta var, hesapta yok: 15,00 KİRİŞLER
+[BETON] Referansta var, hesapta yok: 15,00 PARAPET 110 CM
+[BETON] Referansta var, hesapta yok: 3,00 DÖŞEME
+[BETON] Referansta var, hesapta yok: 3,00 KİRİŞLER
+[BETON] Referansta var, hesapta yok: 3,00 PARAPET
+[BETON] Referansta var, hesapta yok: 3,00/6,00 KOTLARI ARASI KOLON
+[BETON] Referansta var, hesapta yok: 6,00 DÖŞEME
+[BETON] Referansta var, hesapta yok: 6,00 KİRİŞLER
+[BETON] Referansta var, hesapta yok: 6,00 PARAPET
+[BETON] Referansta var, hesapta yok: 6,00/9,00 KOTLARI ARASI KOLON
+[BETON] Referansta var, hesapta yok: 9,00 DÖŞEME
+[BETON] Referansta var, hesapta yok: 9,00 KİRİŞLER
+[BETON] Referansta var, hesapta yok: 9,00 PARAPET
+[BETON] Referansta var, hesapta yok: 9,00/12,00 KOTLARI ARASI KOLON
+[BETON] Referansta var, hesapta yok: 90 CM BACALAR
+[BETON] Referansta var, hesapta yok: ASANSÖR KULE
+[BETON] Referansta var, hesapta yok: ASANSÖR KULE DÖŞEME
+[BETON] Referansta var, hesapta yok: ASANSÖR KULE PARAPET 50 CM
+[BETON] Referansta var, hesapta yok: ÇATI
+[BETON] Hesapta var, referansta yok: CATI ASANSOR KULE
+[BETON] Hesapta var, referansta yok: CATI DOSEME
+[BETON] Hesapta var, referansta yok: CATI DOSEME BOSLUK MINHA
+[BETON] Hesapta var, referansta yok: CATI PARAPET
+[BETON] Referansta var, hesapta yok: DÖŞEME BOŞLUK MİNHA
+[BETON] Referansta var, hesapta yok: GRO
+[BETON] Referansta var, hesapta yok: KORUMA
+[BETON] TEMEL: hesap=318.3047 ref=160.5500 (rel=98.26%)

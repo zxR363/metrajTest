@@ -1,0 +1,13 @@
+proje_adi: "Varsayilan Proje (jenerik)"
+# NOT: Bu klasor varsayilan dahili konfigtir.  Yeni bir proje icin:
+#   python -m metraj.cli new-project <yol> --proje-adi "Adi"
+# komutunu kullanip proje basi konfig olusturmak onerilir.
+katlar:
+  - {kod: "B", ad: "Bodrum", kot_alt: -8.0, kot_ust: -3.5}
+  - {kod: "Z", ad: "Zemin", kot_alt: -0.5, kot_ust: 4.0}
+  - {kod: "1", ad: "1. Kat", kot_alt: 4.0, kot_ust: 8.0}
+  - {kod: "2", ad: "2. Kat", kot_alt: 8.0, kot_ust: 12.0}
+
+duvar_yukseklik_bantlari: [0.10, 0.15, 0.20, 0.25, 0.30]
+kapi_yuvarlama_cm: 5.0
+pencere_yuvarlama_cm: 5.0

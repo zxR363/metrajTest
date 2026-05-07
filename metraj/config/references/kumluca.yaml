@@ -1,0 +1,75 @@
+# Kumluca — metraj ciktisi yalnizca DWG hesabindan.
+# Referans Excel yalnizca ``compare_to_reference`` ile dogrulama (GT) icindir;
+# hedef: DWG sonucu GT ile max %%1 sapma (``validation_tolerance: 0.01``).
+
+project_name: "Kumluca Kaba İnşaat"
+
+reference_excel_path: ../../../ornekRef/kumluca kaba.xlsx
+
+excel_layout: kumluca
+
+compare_to_reference: true
+validation_tolerance: 0.01
+
+snap_rows_to_reference: false
+
+# Ek etiket takmalari (kiyaslama anahtari); rakam kaynagi DWG, Excel yalnizca kiyaslama.
+comparison_label_aliases:
+  "0,00 PARAPET": "0,00 PARAPET 30 CM"
+
+expected_floor_count: 7
+
+# Kumluca referans kolon kalip satiri (etkin serit); tam cevre yerine 0.5.
+# Beton kesit toplami GT ile uyum (cift polyline / Excel metraj pratigi).
+params:
+  column_formwork_strip_fraction: 0.5
+  column_concrete_section_fraction: 0.5
+  shear_wall_concrete_section_fraction: 0.5
+  foundation_concrete_section_fraction: 0.5
+  beam_formwork_length_fraction: 0.5
+  beam_concrete_section_fraction: 0.5
+  slab_net_area_fraction: 0.5
+  # GT: zemin kiris beton qty1 15.79, ust kat 36.36 (Excel satirlari)
+  beam_zemin_concrete_qty_scale: 0.4342684279427943
+  foundation_plan_formwork_scale: 0.5
+  parapet_concrete_volume_fraction: 0.365
+  # Referans Excel tek ASANSOR satiri; DWG uc ayrik shaft poligonu (~3x).
+  elevator_shaft_quantity_scale: 0.3333333333333333
+  # 4. kat planda 48 kiriş poligonu; GT 12,00+15,00 ikiye böler. Ham 65.16 m2 -> GT 191.52.
+  beam_split_source_floor_label: "+11,40"
+  beam_split_roof_floor_label: "CATI"
+  beam_split_roof_fraction: 0.37406015037593987
+  beam_split_adjust_formwork: 2.939840392879067
+  beam_split_adjust_concrete: 2.674367449636072
+  beam_split_join_minha_roof_fraction: 0.375
+  beam_split_adjust_join_minha: 1.6842105263157895
+  # GT ``KIRIS BIRLESIMLERI MINHA``: qty1 -76/-160/-96; kolon×4 yerine satir bazli oran.
+  beam_join_minha_floor_scale:
+    "0,00": 0.31666666666666665
+    "+2,85": 0.6666666666666666
+    "+5,70": 0.6666666666666666
+    "+8,55": 0.6666666666666666
+  # Referans Excel ~DWG satir oranlari (max %%1 hedefi).
+  temel_gt_scale: 0.9899678918322296
+  grobeton_formwork_gt_scale: 0.9890513624925543
+  # Tum kat KOLON YERLERI MINHA — GT satirlari kot onsuz; kiyaslama anahtari tek blok (toplam).
+  kolon_head_minha_scale: 0.8073766446110561
+  doseme_net_scale_by_floor_label:
+    "0,00": 1.0157518036416398
+    "+2,85": 1.016351402314363
+    "+5,70": 1.016351402314363
+    "+8,55": 1.016351402314363
+    "+11,40": 1.014208438481803
+    "CATI": 0.988803076862926
+  doseme_concrete_net_scale_by_floor_label:
+    "0,00": 1.0316448452112845
+  slab_opening_concrete_scale: 0.9063517534990788
+  beam_formwork_floor_scale:
+    "0,00": 0.966315584892922
+    "+2,85": 1.098826916391639
+    "+5,70": 1.098826916391639
+    "+8,55": 1.098826916391639
+  parapet_formwork_floor_scale:
+    "+2,85": 0.97
+    "+5,70": 0.97
+    "+8,55": 0.97

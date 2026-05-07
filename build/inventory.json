@@ -1,0 +1,565 @@
+{
+  "source": "/Users/bts-ist-3583/Downloads/metraj/1828-14 MİMARİ PROJE 15.04.2022 REVİZYON.dxf",
+  "units": "m",
+  "layer_count": 62,
+  "block_definition_count": 73,
+  "layer_inventory": {
+    "0": {
+      "line": 606,
+      "polyline": 216,
+      "text": 389,
+      "block": 3,
+      "hatch": 35
+    },
+    "2560ADA3PARSEL": {
+      "line": 20758,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "A-AREA-IDEN": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "A-WALL": {
+      "line": 8,
+      "polyline": 0,
+      "text": 23,
+      "block": 0,
+      "hatch": 0
+    },
+    "AKS": {
+      "line": 741,
+      "polyline": 1251,
+      "text": 1240,
+      "block": 0,
+      "hatch": 0
+    },
+    "ANTED": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "AXIS2": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "BACA": {
+      "line": 3555,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "BALKON": {
+      "line": 1409,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "BEAM3": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "BEAM4": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "CIZGI": {
+      "line": 729,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "COLUMN3": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "COLUMN4": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "DETAIL2": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "DETAIL3": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "DETAIL4": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "DIM_LAY": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "DIM_LAY3": {
+      "line": 2858,
+      "polyline": 124,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "DIŞ ÖLÇÜ": {
+      "line": 581,
+      "polyline": 11,
+      "text": 179,
+      "block": 292,
+      "hatch": 0
+    },
+    "DUVAR": {
+      "line": 16277,
+      "polyline": 1208,
+      "text": 4,
+      "block": 0,
+      "hatch": 0
+    },
+    "Defpoints": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "EMSAL": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "Genel01_1": {
+      "line": 68,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 912
+    },
+    "KADASTRO": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "KAPI K.G.": {
+      "line": 34577,
+      "polyline": 1738,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "KAPI PLAN": {
+      "line": 18,
+      "polyline": 0,
+      "text": 610,
+      "block": 604,
+      "hatch": 0
+    },
+    "KESİT": {
+      "line": 22,
+      "polyline": 50,
+      "text": 144,
+      "block": 144,
+      "hatch": 0
+    },
+    "KESİT ÇATI": {
+      "line": 2230,
+      "polyline": 97,
+      "text": 173,
+      "block": 0,
+      "hatch": 38
+    },
+    "KOLON": {
+      "line": 3229,
+      "polyline": 1262,
+      "text": 0,
+      "block": 16,
+      "hatch": 8
+    },
+    "KORKULUK": {
+      "line": 10522,
+      "polyline": 219,
+      "text": 0,
+      "block": 0,
+      "hatch": 2
+    },
+    "KOTLAR": {
+      "line": 18,
+      "polyline": 0,
+      "text": 2249,
+      "block": 1557,
+      "hatch": 0
+    },
+    "KİREMİT": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 15,
+      "hatch": 0
+    },
+    "LGP": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "LGP-SLAB2": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "LGP-SLAB3": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "LINES": {
+      "line": 6,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "MERDİVEN": {
+      "line": 3125,
+      "polyline": 691,
+      "text": 749,
+      "block": 0,
+      "hatch": 0
+    },
+    "ODA LEJANTI": {
+      "line": 221,
+      "polyline": 6,
+      "text": 997,
+      "block": 0,
+      "hatch": 0
+    },
+    "OLCU": {
+      "line": 22,
+      "polyline": 6,
+      "text": 3484,
+      "block": 0,
+      "hatch": 0
+    },
+    "PENC3": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "PENCERE K.G.": {
+      "line": 20846,
+      "polyline": 1345,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "PENCERE PLAN": {
+      "line": 264,
+      "polyline": 0,
+      "text": 515,
+      "block": 488,
+      "hatch": 0
+    },
+    "PERDE": {
+      "line": 572,
+      "polyline": 135,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "REBAR": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "REBAR2": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "REBAR_DET2": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "REBAR_DET3": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "SECTION2": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "SECTION3": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "SECTION4": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "SIVA": {
+      "line": 8,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "SLAB3": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "TABLE2": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "TABLE3": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "TABLE4": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "TARAMA": {
+      "line": 16054,
+      "polyline": 7,
+      "text": 0,
+      "block": 156,
+      "hatch": 529
+    },
+    "TEFRIS": {
+      "line": 850,
+      "polyline": 331,
+      "text": 0,
+      "block": 988,
+      "hatch": 0
+    },
+    "VAZİYET ÖLÇÜ": {
+      "line": 475,
+      "polyline": 0,
+      "text": 190,
+      "block": 310,
+      "hatch": 0
+    },
+    "YAZI": {
+      "line": 78,
+      "polyline": 664,
+      "text": 3011,
+      "block": 0,
+      "hatch": 0
+    },
+    "_3734": {
+      "line": 0,
+      "polyline": 0,
+      "text": 0,
+      "block": 0,
+      "hatch": 0
+    },
+    "İÇ ÖLÇÜ": {
+      "line": 2279,
+      "polyline": 1,
+      "text": 653,
+      "block": 1304,
+      "hatch": 0
+    }
+  },
+  "top_blocks": {
+    "_Oblique": 1906,
+    "A$C2F217825": 546,
+    "A$C15DF17DA": 507,
+    "A$C73E3177F": 504,
+    "A$Cfdddafb1": 270,
+    "A$C2834ce86": 178,
+    "araba": 152,
+    "A$Cf5eeb05e": 146,
+    "A$C23d179aa": 146,
+    "A$C1F132E6B": 146,
+    "A$C66DC21BF": 144,
+    "A$C0f94035e": 143,
+    "A$C8b8e41b3": 141,
+    "A$C5e194d6a": 140,
+    "A$C368bebd3": 140,
+    "A$Cf74c48fe": 139,
+    "A$C2d1456ee": 110,
+    "A$C1DB06B79": 100,
+    "A$C09B12E93": 62,
+    "A$C73c6e019": 44,
+    "A$C71385F07": 33,
+    "A$C31C101B4": 33,
+    "SDFSFSF": 16,
+    "A$C337F348A": 15,
+    "G$CF07631DD": 12,
+    "G$CAF17B0F2": 12,
+    "G$C9110FB34": 12,
+    "G$C264C6F61": 11,
+    "G$C7F30F0D1": 9,
+    "G$C94C71E2D": 8,
+    "G$CA8BA9EDD": 8,
+    "G$CF6C8855E": 8,
+    "A$7E613F2415B": 6,
+    "A$7E615F3616371": 4,
+    "G$C4ADA047A": 4,
+    "G$C73D63C63": 2,
+    "A$Cb04600d9": 2,
+    "A$C246abb28": 2,
+    "G$C3EC3E330": 2,
+    "G$C6545FFA3": 2,
+    "A$C357606E1": 2,
+    "Block1": 1,
+    "A$7E615C354139": 1,
+    "G$CCC679AEA": 1,
+    "G$C1A251506": 1,
+    "A$C577d5f14": 1,
+    "EFSDFSF": 1,
+    "SFSFSF": 1,
+    "G$C6A5D770B": 1,
+    "G$C7DB356C8": 1
+  },
+  "totals": {
+    "lines": 143006,
+    "polylines": 9362,
+    "texts": 14610,
+    "blocks": 5877,
+    "hatches": 1524
+  },
+  "autodetect": {
+    "role_to_layers": {
+      "wall": [
+        "A-WALL",
+        "DUVAR"
+      ],
+      "grid": [
+        "AKS"
+      ],
+      "door": [
+        "KAPI K.G.",
+        "KAPI PLAN"
+      ],
+      "column": [
+        "KOLON"
+      ],
+      "stair": [
+        "MERDİVEN"
+      ],
+      "text_height": [
+        "OLCU"
+      ],
+      "window": [
+        "PENCERE K.G.",
+        "PENCERE PLAN"
+      ]
+    },
+    "unmatched_layers": [
+      "0",
+      "2560ADA3PARSEL",
+      "BACA",
+      "BALKON",
+      "CIZGI",
+      "DIM_LAY3",
+      "DIŞ ÖLÇÜ",
+      "Genel01_1",
+      "KESİT",
+      "KESİT ÇATI",
+      "KORKULUK",
+      "KOTLAR",
+      "KİREMİT",
+      "LINES",
+      "ODA LEJANTI",
+      "PERDE",
+      "SIVA",
+      "TARAMA",
+      "TEFRIS",
+      "VAZİYET ÖLÇÜ",
+      "YAZI",
+      "İÇ ÖLÇÜ"
+    ],
+    "layer_to_role": {
+      "A-WALL": "wall",
+      "AKS": "grid",
+      "DUVAR": "wall",
+      "KAPI K.G.": "door",
+      "KAPI PLAN": "door",
+      "KOLON": "column",
+      "MERDİVEN": "stair",
+      "OLCU": "text_height",
+      "PENCERE K.G.": "window",
+      "PENCERE PLAN": "window"
+    }
+  }
+}

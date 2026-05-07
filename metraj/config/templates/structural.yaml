@@ -1,0 +1,57 @@
+# Yapisal (kaba insaat) metraj konfigurasyonu - sablon.
+# Yeni proje icin kopyalayip kat kotlarini ve parametreleri firmanin
+# standardina gore duzenleyin.
+
+project_name: "Yapisal Metraj (jenerik 6 kat)"
+
+# DWG'de kac kat plani yan yana cizilmis? Otomatik tespit kullanilir,
+# bu deger sadece dogrulama amacli.
+expected_floor_count: 7
+
+# Yazi/etiket katmanlari -- kat baslıklarinin (TEMEL, 0,00, 3,00 ...) yer
+# aldigi katmanlari listele.  Otomatik bulunamazsa elle gir.
+floor_label_layers: []
+  # - YAZI
+  # - YAZI_MIMARI_GENEL_PRY
+
+# Katlar (en alttan en uste).  label DWG'deki etiketle uyumlu olsun.
+# Plan sayisi expected_floor_count ile eslesirse otomatik atama bu liste
+# sirasiyla yapilir.
+floors:
+  - label: "TEMEL"
+    elevation_m: -3.00
+    storey_height_m: 2.85
+  - label: "0,00"
+    elevation_m: 0.00
+    storey_height_m: 2.85
+  - label: "3,00"
+    elevation_m: 3.00
+    storey_height_m: 2.85
+  - label: "6,00"
+    elevation_m: 6.00
+    storey_height_m: 2.85
+  - label: "9,00"
+    elevation_m: 9.00
+    storey_height_m: 2.85
+  - label: "12,00"
+    elevation_m: 12.00
+    storey_height_m: 2.85
+  - label: "15,00"
+    elevation_m: 15.00
+    storey_height_m: 2.85
+
+# Hesap parametreleri
+params:
+  typical_storey_height_m: 2.85
+  foundation_depth_m: 0.5
+  lean_concrete_thickness_m: 0.10
+  roof_protection_thickness_m: 0.05
+  roof_slab_thickness_m: 0.10
+  slab_thickness_m: 0.15
+  beam_depth_m: 0.45
+  beam_join_minha_m: 0.135
+  beam_height_m: 0.45
+  parapet_thickness_m: 0.20
+  concrete_grade: "C35"
+  elevator_extra_height_m: 1.45
+  chimney_height_m: 0.9

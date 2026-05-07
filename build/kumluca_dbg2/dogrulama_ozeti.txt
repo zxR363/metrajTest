@@ -1,0 +1,61 @@
+Referans: /Users/bts-ist-3583/Downloads/metraj/ornekRef/kumluca kaba.xlsx
+Esik (rtol): 0.01
+KALIP max rel sapma: 45.6456%
+BETON max rel sapma: 130.2707%
+Uyari satiri: 55
+
+[KALIP] 0,00 DOSEME: hesap=261.9700 ref=266.0800 (rel=1.54%)
+[KALIP] 0,00 KIRISLER: hesap=54.5400 ref=52.6950 (rel=3.50%)
+[KALIP] Hesapta var, referansta yok: 0,00 PARAPET
+[KALIP] Referansta var, hesapta yok: 0,00 PARAPET 30 CM
+[KALIP] +11,40 DOSEME: hesap=284.4393 ref=288.4400 (rel=1.39%)
+[KALIP] +11,40 KIRISLER: hesap=65.1600 ref=119.8800 (rel=45.65%)
+[KALIP] Hesapta var, referansta yok: +11,40 PARAPET
+[KALIP] Referansta var, hesapta yok: 12,00 PARAPET 110 CM
+[KALIP] Referansta var, hesapta yok: 12,00 PARAPET 30 CM
+[KALIP] CATI DOSEME: hesap=199.6352 ref=197.4000 (rel=1.13%)
+[KALIP] Referansta var, hesapta yok: 15,00 KİRİŞLER
+[KALIP] Hesapta var, referansta yok: CATI PARAPET
+[KALIP] Referansta var, hesapta yok: 15,00 PARAPET 110 CM
+[KALIP] +2,85 DOSEME: hesap=251.9050 ref=256.0200 (rel=1.61%)
+[KALIP] +2,85 KIRISLER: hesap=109.0800 ref=119.8800 (rel=9.01%)
+[KALIP] +2,85 PARAPET: hesap=6.0000 ref=5.8200 (rel=3.09%)
+[KALIP] +5,70 DOSEME: hesap=251.9050 ref=256.0200 (rel=1.61%)
+[KALIP] +5,70 KIRISLER: hesap=109.0800 ref=119.8800 (rel=9.01%)
+[KALIP] +5,70 PARAPET: hesap=6.0000 ref=5.8200 (rel=3.09%)
+[KALIP] +8,55 DOSEME: hesap=251.9050 ref=256.0200 (rel=1.61%)
+[KALIP] +8,55 KIRISLER: hesap=109.0800 ref=119.8800 (rel=9.01%)
+[KALIP] Referansta var, hesapta yok: 9,00 PARAPET
+[KALIP] Referansta var, hesapta yok: 90 CM BACALAR
+[KALIP] Referansta var, hesapta yok: ASANSÖR KULE DÖŞEME
+[KALIP] Referansta var, hesapta yok: ASANSÖR KULE PARAPET 50 CM
+[KALIP] GROBETON: hesap=10.0460 ref=9.9460 (rel=1.01%)
+[KALIP] 0,00 KIRIS BIRLESIM MINHA: hesap=-150.1200 ref=-109.6200 (rel=36.95%)
+[KALIP] Referansta var, hesapta yok: KOLON PERDE BİRLEŞİM MİNHA
+[KALIP] 0,00 KOLON YERLERI MINHA: hesap=-95.9651 ref=-77.4800 (rel=23.86%)
+[KALIP] Referansta var, hesapta yok: PERDE PERDE BİRLEŞİM MİNHA
+[KALIP] TEMEL: hesap=49.8300 ref=49.3300 (rel=1.01%)
+[BETON] 0,00 DOSEME: hesap=39.2955 ref=40.5390 (rel=3.07%)
+[BETON] 0,00 KIRISLER: hesap=16.3619 ref=7.1055 (rel=130.27%)
+[BETON] Hesapta var, referansta yok: 0,00 PARAPET
+[BETON] Referansta var, hesapta yok: 0,00 PARAPET 30 CM
+[BETON] +11,40 DOSEME: hesap=42.6659 ref=43.2660 (rel=1.39%)
+[BETON] +11,40 KIRISLER: hesap=9.7739 ref=16.3620 (rel=40.26%)
+[BETON] Hesapta var, referansta yok: +11,40 PARAPET
+[BETON] Referansta var, hesapta yok: 12,00 PARAPET 110 CM
+[BETON] Referansta var, hesapta yok: 12,00 PARAPET 30 CM
+[BETON] Referansta var, hesapta yok: ÇATI
+[BETON] CATI DOSEME: hesap=29.9453 ref=29.6100 (rel=1.13%)
+[BETON] Referansta var, hesapta yok: 15,00 KİRİŞLER
+[BETON] Hesapta var, referansta yok: CATI PARAPET
+[BETON] Referansta var, hesapta yok: 15,00 PARAPET 110 CM
+[BETON] +2,85 DOSEME: hesap=37.7857 ref=38.4030 (rel=1.61%)
+[BETON] +5,70 DOSEME: hesap=37.7857 ref=38.4030 (rel=1.61%)
+[BETON] +8,55 DOSEME: hesap=37.7857 ref=38.4030 (rel=1.61%)
+[BETON] Referansta var, hesapta yok: 9,00 PARAPET
+[BETON] Referansta var, hesapta yok: 90 CM BACALAR
+[BETON] Referansta var, hesapta yok: ASANSÖR KULE DÖŞEME
+[BETON] Referansta var, hesapta yok: ASANSÖR KULE PARAPET 50 CM
+[BETON] 0,00 DOSEME BOSLUK MINHA: hesap=-6.4357 ref=5.8320 (rel=10.35%)
+[BETON] Referansta var, hesapta yok: GRO
+[BETON] Referansta var, hesapta yok: KORUMA

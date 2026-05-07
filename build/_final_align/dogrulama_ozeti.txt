@@ -1,0 +1,5 @@
+Referans: /Users/bts-ist-3583/Downloads/metraj/ornekRef/kumluca kaba.xlsx
+Esik (rtol): 0.01
+KALIP max rel sapma: 0.0000%
+BETON max rel sapma: 0.0000%
+Uyari satiri: 0
