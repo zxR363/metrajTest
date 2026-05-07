@@ -1,0 +1,48 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+.venv/
+venv/
+.env
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# --- Çıktı klasörleri ---
+build/
+out/
+outputs/
+
+# --- CAD (GitHub ~50MB uyarı / ~100MB red; LFS veya repoda tutma) ---
+*.dwg
+*.dxf
+*.dxb
+*.bak
+# Küçük DXF örnekleri test için repoda kalsın (istisna)
+!data/samples/demo.dxf
+!data/samples/alternate.dxf
+
+# --- Excel ---
+*.xlsx
+*.xls
+
+# --- Büyük referans klasörü ---
+ornekRef/
+
+# Köke düşen büyük mimari çizimler
+1828*.dwg
+1828*.dxf
+
+# Kök dizindeki büyük PDF çıktısı
+/metraj.pdf
