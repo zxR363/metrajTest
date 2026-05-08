@@ -1,0 +1,12 @@
+# Kumluca — GT ile aynı ölçek formatında doğrulama (taban: kumluca.yaml).
+#
+# Önceki "params yok" sürümü Excel ile farklı ölçüm dilinde kıyaslıyordu (~2x sapma).
+# Bu profil ``extends`` ile tüm CalcParams / karşılaştırma ayarlarını kumluca.yaml'dan
+# alır; böylece ``dogrulama_ozeti`` çıktısı "çizim + sınıflandırma + firma ölçek tanımı"
+# altında kalır — GT sapması geometri/zincir doğruluğunun göstergesidir.
+#
+# CLI: python -m metraj.cli structural-compare <CAD> --config ... --config ...
+
+extends: kumluca.yaml
+
+project_name: "Kumluca Kaba İnşaat (aynı ölçek — GT doğrulama profili)"

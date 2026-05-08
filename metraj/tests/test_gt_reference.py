@@ -60,6 +60,22 @@ def test_aggregate_rows_by_comparison_key_sums_totals():
     assert row.qty1 == pytest.approx(3.0)
 
 
+def test_extends_inherits_kumluca_params():
+    """kumluca_geometry_only.yaml taban dosyayla aynı CalcParams kullanir."""
+    from metraj.core.structural.config import StructuralConfig
+
+    base_p = ROOT / "metraj" / "config" / "references" / "kumluca.yaml"
+    ext_p = ROOT / "metraj" / "config" / "references" / "kumluca_geometry_only.yaml"
+    if not base_p.is_file() or not ext_p.is_file():
+        pytest.skip("referans yaml yok")
+    base = StructuralConfig.from_file(base_p)
+    child = StructuralConfig.from_file(ext_p)
+    assert child.params.column_formwork_strip_fraction == base.params.column_formwork_strip_fraction
+    assert child.params.temel_gt_scale == base.params.temel_gt_scale
+    assert child.params.beam_split_adjust_formwork == base.params.beam_split_adjust_formwork
+    assert child.project_name != base.project_name
+
+
 def test_kumluca_yaml_validation_gate_one_percent():
     """Referans YAML: dogrulama esigi %%1; cikti DWG hesabidir (referans yalnizca kiyaslama)."""
     from metraj.core.structural.config import StructuralConfig

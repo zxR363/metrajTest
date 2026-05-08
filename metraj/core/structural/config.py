@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Literal, Optional, Set
 
 import yaml
 
@@ -11,6 +11,47 @@ from .calculator import CalcParams
 
 
 ExcelLayout = Literal["generic", "kumluca"]
+
+
+def _deep_merge_mapping(base: dict, override: dict) -> dict:
+    """Ikinci sozluk birincinin uzerine yazilir; ic ice dict'ler birlestirilir."""
+    out = dict(base)
+    for key, val in override.items():
+        if key == "extends":
+            continue
+        if (
+            key in out
+            and isinstance(out[key], dict)
+            and isinstance(val, dict)
+        ):
+            out[key] = _deep_merge_mapping(out[key], val)
+        else:
+            out[key] = val
+    return out
+
+
+def _load_structural_yaml_dict(path: Path, chain: Optional[Set[Path]] = None) -> dict:
+    """YAML yukler; ``extends: dosya.yaml`` ile taban dosya ile birlestirir."""
+    path = path.resolve()
+    chain = chain or set()
+    if path in chain:
+        raise ValueError(f"YAML extends dongusu: {path}")
+    chain = set(chain)
+    chain.add(path)
+
+    with open(path, "r", encoding="utf-8") as fh:
+        data = yaml.safe_load(fh) or {}
+    if not isinstance(data, dict):
+        raise ValueError(f"YAML kok nesnesi sozluk olmali: {path}")
+
+    extends = data.pop("extends", None)
+    if extends:
+        base_path = (path.parent / str(extends)).resolve()
+        if not base_path.is_file():
+            raise FileNotFoundError(f"extends bulunamadi: {base_path}")
+        base_data = _load_structural_yaml_dict(base_path, chain)
+        data = _deep_merge_mapping(base_data, data)
+    return data
 
 
 @dataclass
@@ -47,8 +88,7 @@ class StructuralConfig:
     @classmethod
     def from_file(cls, path: str | Path) -> "StructuralConfig":
         path = Path(path)
-        with open(path, "r", encoding="utf-8") as fh:
-            data = yaml.safe_load(fh) or {}
+        data = _load_structural_yaml_dict(path)
         cfg = cls.from_dict(data)
         # Referans Excel yolu YAML dosyasina gore cozumle
         ref = cfg.reference_excel_path

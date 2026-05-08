@@ -250,6 +250,82 @@ def _cmd_run_structural(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_structural_compare(args: argparse.Namespace) -> int:
+    """Ayni CAD ile birden fazla yapisal YAML kos; GT dogrulama metriklerini kiyasla."""
+    from metraj.core.structural import StructuralConfig, StructuralPipeline
+
+    cad = Path(args.cad)
+    out_base = Path(args.output)
+    out_base.mkdir(parents=True, exist_ok=True)
+
+    print(f"CAD: {cad.resolve()}")
+    print(f"Cikti tabani: {out_base.resolve()}")
+    print()
+
+    rows: list[dict] = []
+    for i, cfg_path in enumerate(args.config):
+        cfg_path = Path(cfg_path)
+        sub_out = out_base / f"{i:02d}_{cfg_path.stem}"
+        scfg = StructuralConfig.from_file(cfg_path)
+        pipeline = StructuralPipeline(scfg)
+        try:
+            result = pipeline.run(
+                cad_path=cad,
+                output_dir=sub_out,
+                write_excel=not args.no_excel,
+            )
+        except Exception as exc:
+            logging.exception("structural-compare kosusu basarisiz")
+            print(f"HATA [{cfg_path}]: {exc}", file=sys.stderr)
+            return 1
+
+        vd = result.validation_detail
+        rows.append(
+            {
+                "cfg": str(cfg_path),
+                "out": str(sub_out),
+                "kalip_m2": result.report.formwork_total_m2,
+                "beton_m3": result.report.concrete_total_m3,
+                "max_k_pct": (vd.max_rel_error_formwork * 100.0) if vd else None,
+                "max_b_pct": (vd.max_rel_error_concrete * 100.0) if vd else None,
+                "warnings": len(vd.warning_lines) if vd else None,
+                "summary": result.validation_summary_path,
+            }
+        )
+
+    w_cfg = max(len(r["cfg"]) for r in rows)
+    hdr = (
+        f"{'Konfig':<{w_cfg}}  Kalip(m2)   Beton(m3)   K_max%%   B_max%%   "
+        f"Uyari  dogrulama_ozeti"
+    )
+    print(hdr)
+    print("-" * len(hdr))
+    for r in rows:
+        mk = f"{r['max_k_pct']:.4f}" if r["max_k_pct"] is not None else "—"
+        mb = f"{r['max_b_pct']:.4f}" if r["max_b_pct"] is not None else "—"
+        nw = str(r["warnings"]) if r["warnings"] is not None else "—"
+        summ = str(r["summary"]) if r["summary"] else "—"
+        print(
+            f"{r['cfg']:<{w_cfg}}  {r['kalip_m2']:>9.2f}  {r['beton_m3']:>9.2f}  "
+            f"{mk:>8}  {mb:>8}  {nw:>5}  {summ}"
+        )
+
+    if len(rows) >= 2:
+        k0 = rows[0]["kalip_m2"]
+        b0 = rows[0]["beton_m3"]
+        same_totals = all(
+            abs(r["kalip_m2"] - k0) < 1e-4 and abs(r["beton_m3"] - b0) < 1e-4
+            for r in rows
+        )
+        if same_totals:
+            print()
+            print(
+                "Not: Tum kosular ayni kalip/beton toplamina sahip — YAML olcekleri "
+                "eslesiyorsa GT dogrulama satirlari da ayni olmalidir."
+            )
+    return 0
+
+
 def _cmd_compare(args: argparse.Namespace) -> int:
     """Compare a generated metraj output against the firma's ground-truth Excel."""
     config = PipelineConfig.from_directory(args.config)
@@ -388,6 +464,28 @@ def build_parser() -> argparse.ArgumentParser:
     cmp_.add_argument("ground_truth", help="Mevcut Excel mahal kitabi")
     cmp_.add_argument("-o", "--output", default="build")
     cmp_.set_defaults(func=_cmd_compare)
+
+    scmp = sub.add_parser(
+        "structural-compare",
+        help="Ayni CAD'i birden fazla yapisal YAML ile kos; dogrulama ozetini kiyasla",
+    )
+    scmp.add_argument("cad", help="DWG/DXF dosyasi")
+    scmp.add_argument(
+        "--config",
+        dest="config",
+        action="append",
+        required=True,
+        metavar="YAML",
+        help="Yapisal YAML (tekrarlanabilir; sirayla kosulur)",
+    )
+    scmp.add_argument(
+        "-o",
+        "--output",
+        default="build/structural_compare",
+        help="Her kosu icin alt klasor (varsayilan: build/structural_compare)",
+    )
+    scmp.add_argument("--no-excel", action="store_true")
+    scmp.set_defaults(func=_cmd_structural_compare)
 
     ui = sub.add_parser("ui", help="PySide6 grafiksel arayuzu baslat")
     ui.set_defaults(func=_cmd_ui)
