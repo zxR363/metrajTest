@@ -1,4 +1,4 @@
-"""Eleman boyutuna gore yeniden siniflandirma.
+"""Eleman boyutuna gore yeniden siniflandirma + Faz 3 geometric_classify.
 
 DWG'de cogu zaman:
 - KOLON NA katmanina asansor perdeleri / baca ayaklari da cizilir; bunlar
@@ -6,17 +6,87 @@ DWG'de cogu zaman:
 - Kucuk PERDE polygonlari aslinda kolon-perde birlesim parcalaridir.
 
 Heuristik: perimetre ve aspect ratio.
+
+Faz 3:
+* ``GeometricThresholds`` — alan/aspect ratio esikleri (config'den override).
+* ``geometric_classify(element, thresholds)`` — katman bilgisi olmadan geometriden
+  ElementKind tahmini (kolon < 2.5 aspect, perde >= 8.0, dosememe alan > 50 m2).
+* ``find_classification_conflicts(elements)`` — layer_kind ile geometric_kind
+  uyusmazligi olanlari uyari listesi olarak doner; sessiz overwrite YAPMAZ.
+* ``LineString`` (acik LINE/polyline) kirislerinde ``geom.length`` dogrudan
+  ele alinir.
 """
 from __future__ import annotations
 
 import logging
-from typing import List, Sequence
+from dataclasses import dataclass
+from typing import Any, Dict, List, Mapping, Optional, Sequence
 
-from shapely.geometry import Polygon
+from shapely.geometry import LineString, Polygon
+from shapely.geometry.base import BaseGeometry
 
 from .elements import StructuralElement
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Faz 3: Geometric classification
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class GeometricThresholds:
+    """Geometriden ElementKind tahmini icin sabit esikler.
+
+    Tum esikler config'den (``geometric_thresholds: {...}``) override edilebilir.
+    Varsayilanlar Kumluca elemanlarinda gozlemlenen aralıklara dayanir
+    (bkz. ``build/bench_phase0/calibrated/elements_diagnostics.json``).
+    """
+
+    #: Aspect ratio < column_max: kompakt eleman -> kolon adayi.
+    column_max_aspect: float = 2.5
+    #: column_max < aspect < wall_min: belirsiz (kuskulu); ne kolon ne perde.
+    wall_min_aspect: float = 8.0
+    #: Kolon alani genelde 0.05..5 m^2 araliginda (Kumluca medyan ~0.20).
+    column_max_area_m2: float = 5.0
+    #: Perde polygonu da kucuk-orta alanli olabilir; cok buyukse perde degildir.
+    wall_max_area_m2: float = 50.0
+    #: Doseme/temel/grobeton: buyuk alan.
+    slab_min_area_m2: float = 30.0
+    #: Temel polygonu cogu zaman tek/iki adet ve doseme'den belirgin buyuk olur;
+    #: 200 m^2 esigi: 150 m^2 doseme, 300 m^2 radye temel ayrimini saglar.
+    foundation_min_area_m2: float = 200.0
+    #: Acik LINE veya LineString: kiris adayi.
+    beam_min_length_m: float = 1.0
+    #: Geometrik ayrim icin minimum kabul confidence (0..1). Daha dusukse
+    #: "kuskulu" doner.
+    min_confidence: float = 0.5
+
+    @classmethod
+    def from_dict(cls, data: Optional[Mapping[str, Any]]) -> "GeometricThresholds":
+        if not data:
+            return cls()
+        kwargs: Dict[str, Any] = {}
+        for fld in cls.__dataclass_fields__:
+            if fld in data:
+                try:
+                    kwargs[fld] = float(data[fld])
+                except (TypeError, ValueError):
+                    continue
+        return cls(**kwargs)
+
+
+@dataclass
+class GeometricClassification:
+    """``geometric_classify`` sonucu."""
+
+    #: Tahmin edilen kind (kolon/perde/doseme/temel/kiris); None = belirsiz.
+    kind: Optional[str]
+    #: 0..1 arasi guven; ``min_confidence`` altinda ise pratikte kuskulu.
+    confidence: float
+    #: Insan-okunabilir gerekce ("aspect=12.5>=wall_min").
+    reason: str
 
 
 def _aspect_ratio(geom) -> float:
@@ -44,6 +114,181 @@ def _max_dimension(geom) -> float:
         return max(max(xs) - min(xs), max(ys) - min(ys))
     except Exception:
         return 0.0
+
+
+def geometric_classify(
+    element: StructuralElement,
+    thresholds: Optional[GeometricThresholds] = None,
+) -> GeometricClassification:
+    """Bir elemanin geometrisinden olasi ElementKind'i tahmin eder.
+
+    Katman bilgisi KULLANILMAZ — tamamen alan/aspect/geom tipi sinyalleriyle
+    karar verir. Hibrit kontrolde (``find_classification_conflicts``) bu sonuc
+    layer-based ``element.kind`` ile karsilastirilir; uyusmazlik UYARI olarak
+    raporlanir, sessiz overwrite yapilmaz.
+
+    Hierarsi:
+      1. Acik LINE / LineString -> beam (kiris).
+      2. Polygon (closed):
+         - alan >= foundation_min_area_m2 ve aspect < column_max -> foundation/slab
+           (alan >= 200 m2 -> foundation, degilse -> slab).
+         - aspect >= wall_min_aspect ve alan < wall_max_area_m2 -> shear_wall.
+         - aspect < column_max_aspect ve alan < column_max_area_m2 -> column.
+         - alan >= slab_min_area_m2 ve aspect < column_max -> slab.
+         - aksi durumda kuskulu (None, confidence < min_confidence).
+
+    Confidence: aspect/area esiklerinden uzaklik bazli kaba bir 0..1 skor.
+    """
+    th = thresholds or GeometricThresholds()
+
+    geom: BaseGeometry = element.geom
+
+    # 1) Acik LINE / LineString -> kiris adayi
+    if isinstance(geom, LineString):
+        length = element.length_m if element.length_m > 0 else float(geom.length)
+        if length >= th.beam_min_length_m:
+            # Confidence: 0.6..1.0 (uzunluk arttikca artar)
+            conf = min(1.0, 0.6 + length / 50.0)
+            return GeometricClassification(
+                kind="beam", confidence=conf,
+                reason=f"open_line length={length:.2f}m>={th.beam_min_length_m}",
+            )
+        return GeometricClassification(
+            kind=None, confidence=0.2,
+            reason=f"open_line length={length:.2f}m<{th.beam_min_length_m} (kuskulu)",
+        )
+
+    if not isinstance(geom, Polygon):
+        return GeometricClassification(
+            kind=None, confidence=0.0, reason=f"unsupported_geom={type(geom).__name__}",
+        )
+
+    area = element.area_m2 if element.area_m2 > 0 else float(geom.area)
+    asp = _aspect_ratio(geom)
+
+    # 2a) Cok buyuk + kompakt -> temel veya doseme
+    if area >= th.foundation_min_area_m2 and asp < th.column_max_aspect:
+        return GeometricClassification(
+            kind="foundation", confidence=0.85,
+            reason=f"big_compact area={area:.1f}>={th.foundation_min_area_m2} "
+                   f"aspect={asp:.2f}<{th.column_max_aspect}",
+        )
+
+    # 2b) Uzun-ince -> perde
+    if asp >= th.wall_min_aspect and area < th.wall_max_area_m2:
+        # Confidence: aspect arttikca artar (8'de 0.7, 20'de ~0.95)
+        conf = min(0.95, 0.6 + (asp - th.wall_min_aspect) / 30.0)
+        return GeometricClassification(
+            kind="shear_wall", confidence=conf,
+            reason=f"long_thin aspect={asp:.2f}>={th.wall_min_aspect} area={area:.2f}",
+        )
+
+    # 2c) Kompakt + kucuk -> kolon
+    if asp < th.column_max_aspect and area < th.column_max_area_m2:
+        conf = max(0.6, 1.0 - asp / th.column_max_aspect * 0.3)
+        return GeometricClassification(
+            kind="column", confidence=conf,
+            reason=f"compact_small area={area:.2f}<{th.column_max_area_m2} "
+                   f"aspect={asp:.2f}<{th.column_max_aspect}",
+        )
+
+    # 2d) Orta-buyuk alan kompakt -> doseme
+    if area >= th.slab_min_area_m2 and asp < th.column_max_aspect:
+        return GeometricClassification(
+            kind="slab", confidence=0.75,
+            reason=f"medium_compact area={area:.1f}>={th.slab_min_area_m2} aspect={asp:.2f}",
+        )
+
+    # 2e) Belirsiz bolge (kolon-perde arasi)
+    if th.column_max_aspect <= asp < th.wall_min_aspect:
+        return GeometricClassification(
+            kind=None, confidence=0.3,
+            reason=f"uncertain {th.column_max_aspect}<=aspect={asp:.2f}<{th.wall_min_aspect}",
+        )
+
+    return GeometricClassification(
+        kind=None, confidence=0.2,
+        reason=f"no_match area={area:.2f} aspect={asp:.2f}",
+    )
+
+
+@dataclass
+class ClassificationConflict:
+    """``layer_kind`` ile ``geometric_kind`` uyusmazligi.
+
+    Pipeline'da uyari listesine eklenir; sessiz overwrite yapilmaz — son karar
+    yine ``element.kind``'tedir (layer-bazli). UI bunlari "kuskulu siniflandirma"
+    listesinde gosterir; kullanici manuel override edebilir.
+    """
+
+    element_index: int
+    layer: str
+    layer_kind: str
+    geometric_kind: Optional[str]
+    confidence: float
+    reason: str
+    area_m2: float
+    aspect_ratio: float
+
+
+#: Geometri tek basina ayirt edemedigi dogal cifteler. Bu ciftlerden biri
+#: layer-bazli, digeri geometri-bazli olursa conflict raporlanmaz — UI spam'i
+#: onlemek icin. Faz 6 multi-reference learning bunu cozecek.
+_NATURAL_AMBIGUITY_PAIRS = frozenset({
+    frozenset({"beam", "shear_wall"}),
+    frozenset({"slab", "foundation"}),
+    frozenset({"slab", "roof_slab"}),
+    frozenset({"foundation", "lean_concrete"}),
+})
+
+
+def find_classification_conflicts(
+    elements: Sequence[StructuralElement],
+    thresholds: Optional[GeometricThresholds] = None,
+    *,
+    min_confidence: Optional[float] = None,
+) -> List[ClassificationConflict]:
+    """Layer-bazli ve geometri-bazli sinif farkliysa uyari listesi doner.
+
+    Yalnizca ``geometric_classify`` confidence'i ``min_confidence``'in (veya
+    ``thresholds.min_confidence``) ustunde olan elemanlar uyari verir.
+    Dogal-belirsizlik ciftleri (``_NATURAL_AMBIGUITY_PAIRS``) suppress edilir.
+    """
+    th = thresholds or GeometricThresholds()
+    min_conf = th.min_confidence if min_confidence is None else min_confidence
+    out: List[ClassificationConflict] = []
+    for i, el in enumerate(elements):
+        gc = geometric_classify(el, th)
+        if gc.kind is None or gc.confidence < min_conf:
+            continue
+        if gc.kind == el.kind:
+            continue
+        # Bazi durumlar dogal uyusmazliktir: parapet/elevator_shaft/chimney
+        # layer-bazli kabul edilir, geometri benzer olabilir; sessiz birak.
+        if el.kind in {"parapet", "elevator_shaft", "chimney", "stair",
+                       "protection", "lean_concrete", "roof_slab", "slab_opening"}:
+            continue
+        # Dogal belirsizlik (beam<->shear_wall, slab<->foundation): geometri
+        # ayirt etmiyor; conflict listesi disi.
+        if frozenset({el.kind, gc.kind}) in _NATURAL_AMBIGUITY_PAIRS:
+            continue
+        if isinstance(el.geom, Polygon):
+            asp = _aspect_ratio(el.geom)
+            area = el.area_m2
+        else:
+            asp = 0.0
+            area = 0.0
+        out.append(ClassificationConflict(
+            element_index=i,
+            layer=el.layer,
+            layer_kind=str(el.kind),
+            geometric_kind=gc.kind,
+            confidence=gc.confidence,
+            reason=gc.reason,
+            area_m2=area,
+            aspect_ratio=asp,
+        ))
+    return out
 
 
 def reclassify_columns_to_walls(

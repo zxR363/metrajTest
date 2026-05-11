@@ -250,6 +250,233 @@ def _cmd_run_structural(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_structural_feedback(args: argparse.Namespace) -> int:
+    """Faz 5: proje-bazli FeedbackStore JSON uzerinde CRUD + global hint cikari."""
+    from metraj.core.learning.feedback_store import (
+        FeedbackStore,
+        extract_global_hints,
+        global_hints_to_signal_hints_yaml,
+        load_stores_from_dir,
+    )
+    import yaml as _yaml
+
+    sub_action = args.action
+
+    if sub_action == "list":
+        store = FeedbackStore.load(args.store)
+        print(f"Proje: {store.project_name or '(belirsiz)'}")
+        print(f"Kaynak: {store.source_path}")
+        print()
+        print(f"layer_kind_overrides ({len(store.layer_kind_overrides)}):")
+        for k, v in sorted(store.layer_kind_overrides.items()):
+            print(f"  {k:30s} -> {v}")
+        print(f"comparison_alias_overrides ({len(store.comparison_alias_overrides)}):")
+        for k, v in sorted(store.comparison_alias_overrides.items()):
+            print(f"  {k:30s} -> {v}")
+        print(f"excluded_layers ({len(store.excluded_layers)}): {store.excluded_layers}")
+        print(f"manual_classifications ({len(store.manual_classifications)}):")
+        for mc in store.manual_classifications:
+            print(f"  layer={mc.layer:20s} centroid={mc.centroid} -> {mc.kind} ({mc.reason})")
+        if store.notes:
+            print(f"notes ({len(store.notes)}):")
+            for n in store.notes:
+                print(f"  - {n}")
+        return 0
+
+    if sub_action == "set-layer-kind":
+        store = FeedbackStore.load(args.store)
+        store.set_layer_kind(args.layer, args.kind)
+        if args.project_name and not store.project_name:
+            store.project_name = args.project_name
+        store.save(args.store)
+        print(f"[ok] {args.layer!r} -> {args.kind!r} eklendi: {args.store}")
+        return 0
+
+    if sub_action == "remove-layer-kind":
+        store = FeedbackStore.load(args.store)
+        removed = store.remove_layer_kind(args.layer)
+        store.save(args.store)
+        print(f"[{'ok' if removed else 'noop'}] {args.layer!r}: {args.store}")
+        return 0
+
+    if sub_action == "set-alias":
+        store = FeedbackStore.load(args.store)
+        store.set_alias(args.src, args.dst)
+        store.save(args.store)
+        print(f"[ok] alias {args.src!r} -> {args.dst!r}: {args.store}")
+        return 0
+
+    if sub_action == "exclude-layer":
+        store = FeedbackStore.load(args.store)
+        store.exclude_layer(args.layer)
+        store.save(args.store)
+        print(f"[ok] exclude {args.layer!r}: {args.store}")
+        return 0
+
+    if sub_action == "global-hints":
+        stores = load_stores_from_dir(args.feedback_dir)
+        if not stores:
+            print(f"HATA: feedback dosyasi yok: {args.feedback_dir}", file=sys.stderr)
+            return 2
+        hints = extract_global_hints(stores, min_project_count=args.min_projects)
+        print(f"{len(stores)} projeden {len(hints)} global hint cikarildi.")
+        for h in hints:
+            print(f"  [{h.kind}] {h.source!r} -> {h.target!r}  "
+                  f"(projeler={h.project_count}: {', '.join(h.projects)})")
+        if args.output:
+            payload = global_hints_to_signal_hints_yaml(hints)
+            Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+            with open(args.output, "w", encoding="utf-8") as fh:
+                fh.write("# Otomatik cikarilmis global signal_hints (Faz 5)\n\n")
+                _yaml.safe_dump(payload, fh, allow_unicode=True, sort_keys=False)
+            print(f"\nsignal_hints YAML yazildi: {args.output}")
+        return 0
+
+    print(f"HATA: bilinmeyen alt-komut: {sub_action}", file=sys.stderr)
+    return 2
+
+
+def _cmd_wizard(args: argparse.Namespace) -> int:
+    """Kalibrasyon sihirbazini ac (PySide6 QDialog)."""
+    try:
+        from metraj.app.calibration_wizard import launch_wizard
+    except Exception as exc:
+        print(f"HATA: calibration_wizard import basarisiz: {exc}", file=sys.stderr)
+        return 2
+    cad = Path(args.cad) if args.cad else None
+    ref = Path(args.reference) if args.reference else None
+    out = Path(args.output) if args.output else None
+    try:
+        return launch_wizard(cad=cad, ref=ref, output=out)
+    except RuntimeError as exc:
+        print(f"HATA: {exc}", file=sys.stderr)
+        return 2
+
+
+def _cmd_config_wizard(args: argparse.Namespace) -> int:
+    """Excel-bagimsiz config sihirbazi: kullanici UI'da CalcParams ayarlar.
+
+    Kullanim:
+      metraj config-wizard -o profile.yaml [--preset geometry_full]
+    Sonrasinda:
+      metraj run --mode structural --structural-config profile.yaml <cad>
+    """
+    from metraj.app.structural_config_dialog import (
+        calcparams_to_yaml,
+        launch_config_dialog,
+        list_method_presets,
+        load_method_preset,
+    )
+
+    if args.list_presets:
+        presets = list_method_presets()
+        print(f"Mevcut presetler ({len(presets)}):")
+        for p in presets:
+            print(f"  {p}")
+        return 0
+
+    # GUI'siz preset dump modu
+    if args.preset_only:
+        try:
+            cp = load_method_preset(args.preset)
+        except FileNotFoundError as exc:
+            print(f"HATA: {exc}", file=sys.stderr)
+            return 2
+        out = Path(args.output)
+        calcparams_to_yaml(cp, out, project_name=f"Preset: {args.preset}")
+        print(f"Preset YAML kaydedildi: {out.resolve()}")
+        return 0
+
+    # GUI dialog
+    out = Path(args.output) if args.output else Path("profile.yaml")
+    try:
+        return launch_config_dialog(preset=args.preset, output=out)
+    except RuntimeError as exc:
+        print(f"HATA: {exc}", file=sys.stderr)
+        print("\nGUI'siz preset kaydetmek icin --preset-only kullanin:",
+              file=sys.stderr)
+        print("  metraj config-wizard --preset geometry_full --preset-only "
+              "-o profile.yaml", file=sys.stderr)
+        return 2
+
+
+def _cmd_train_profiles(args: argparse.Namespace) -> int:
+    """Faz 6: N (cad, reference) ciftinden median trained profile uretir."""
+    from metraj.core.learning.profile_trainer import train_profiles_from_pairs
+
+    pairs: list[tuple[Path, Path]] = []
+    for raw in args.pairs:
+        parts = raw.split(",", 1)
+        if len(parts) != 2:
+            print(f"HATA: --pairs format: cad,ref (verilen: {raw!r})",
+                  file=sys.stderr)
+            return 2
+        cad_p = Path(parts[0].strip())
+        ref_p = Path(parts[1].strip())
+        if not cad_p.is_file():
+            print(f"HATA: CAD bulunamadi: {cad_p}", file=sys.stderr)
+            return 2
+        if not ref_p.is_file():
+            print(f"HATA: Reference bulunamadi: {ref_p}", file=sys.stderr)
+            return 2
+        pairs.append((cad_p, ref_p))
+
+    project_names = args.names.split(",") if args.names else None
+
+    print(f"{len(pairs)} (CAD, Excel) cifti egitiliyor...")
+    profile = train_profiles_from_pairs(
+        pairs=pairs,
+        project_names=project_names,
+        output_yaml=args.output,
+        cross_validate=args.cross_validate,
+    )
+    print()
+    print(profile.report)
+    print()
+    print(f"Trained profile YAML: {args.output}")
+    return 0
+
+
+def _cmd_structural_fit(args: argparse.Namespace) -> int:
+    """Faz 4: CAD + referans Excel'den CalcParams profili otomatik fit eder."""
+    from metraj.core.structural.config import StructuralConfig
+    from metraj.core.structural.profile_fitter import fit_profile_from_dxf
+
+    cad = Path(args.cad)
+    ref = Path(args.reference)
+    out_yaml = Path(args.output)
+
+    if not cad.is_file():
+        print(f"HATA: CAD bulunamadi: {cad}", file=sys.stderr)
+        return 2
+    if not ref.is_file():
+        print(f"HATA: Referans Excel bulunamadi: {ref}", file=sys.stderr)
+        return 2
+
+    base_cfg = None
+    if args.base_config:
+        base_cfg = StructuralConfig.from_file(args.base_config)
+
+    print(f"CAD: {cad.resolve()}")
+    print(f"Referans: {ref.resolve()}")
+    print(f"Cikti YAML: {out_yaml.resolve()}")
+    print()
+    print("Saf geometri pipeline'i kosturuluyor (baseline)...")
+    result = fit_profile_from_dxf(
+        cad_path=cad,
+        reference_excel=ref,
+        output_yaml=out_yaml,
+        base_config=base_cfg,
+    )
+    print()
+    print(result.report)
+    print()
+    print(f"Profil YAML yazildi: {result.yaml_path}")
+    print("Sonraki adim: `metraj run --mode structural --structural-config "
+          f"{out_yaml} <cad>`")
+    return 0
+
+
 def _cmd_structural_compare(args: argparse.Namespace) -> int:
     """Ayni CAD ile birden fazla yapisal YAML kos; GT dogrulama metriklerini kiyasla."""
     from metraj.core.structural import StructuralConfig, StructuralPipeline
@@ -487,7 +714,127 @@ def build_parser() -> argparse.ArgumentParser:
     scmp.add_argument("--no-excel", action="store_true")
     scmp.set_defaults(func=_cmd_structural_compare)
 
-    ui = sub.add_parser("ui", help="PySide6 grafiksel arayuzu baslat")
+    sfb = sub.add_parser(
+        "structural-feedback",
+        help="Faz 5: proje feedback JSON store uzerinde CRUD + global hint cikari",
+    )
+    sfb_sub = sfb.add_subparsers(dest="action", required=True)
+
+    sfb_list = sfb_sub.add_parser("list", help="Store'daki tum overrideleri listele")
+    sfb_list.add_argument("store", help="Feedback JSON yolu")
+    sfb_list.set_defaults(func=_cmd_structural_feedback)
+
+    sfb_set = sfb_sub.add_parser("set-layer-kind",
+                                  help="Katman icin ElementKind override ekle")
+    sfb_set.add_argument("store")
+    sfb_set.add_argument("layer", help="DXF katman adi")
+    sfb_set.add_argument("kind", help="ElementKind (column/shear_wall/beam/slab/...)")
+    sfb_set.add_argument("--project-name", default=None)
+    sfb_set.set_defaults(func=_cmd_structural_feedback)
+
+    sfb_rm = sfb_sub.add_parser("remove-layer-kind",
+                                 help="Katman override'ini kaldir")
+    sfb_rm.add_argument("store")
+    sfb_rm.add_argument("layer")
+    sfb_rm.set_defaults(func=_cmd_structural_feedback)
+
+    sfb_al = sfb_sub.add_parser("set-alias",
+                                 help="Comparison alias ekle (gt_io.comparison_key)")
+    sfb_al.add_argument("store")
+    sfb_al.add_argument("src", help="Kaynak etiket")
+    sfb_al.add_argument("dst", help="Hedef etiket")
+    sfb_al.set_defaults(func=_cmd_structural_feedback)
+
+    sfb_ex = sfb_sub.add_parser("exclude-layer",
+                                 help="Katmani extractor'dan disla")
+    sfb_ex.add_argument("store")
+    sfb_ex.add_argument("layer")
+    sfb_ex.set_defaults(func=_cmd_structural_feedback)
+
+    sfb_gh = sfb_sub.add_parser("global-hints",
+                                 help="Birden fazla projedeki ortak override'lari signal_hints YAML olarak cikar")
+    sfb_gh.add_argument("feedback_dir", help="*.json feedback dosyalarinin oldugu klasor")
+    sfb_gh.add_argument("--min-projects", type=int, default=2,
+                        help="Bir override global olmak icin minimum proje sayisi")
+    sfb_gh.add_argument("-o", "--output", default=None,
+                        help="Cikti signal_hints YAML (verilmezse sadece stdout)")
+    sfb_gh.set_defaults(func=_cmd_structural_feedback)
+
+    wz = sub.add_parser(
+        "wizard",
+        help="Kalibrasyon sihirbazini ac (PySide6 GUI; Faz 4 profile fitter sarmal)",
+    )
+    wz.add_argument("--cad", default=None, help="On-set CAD yolu")
+    wz.add_argument("--reference", default=None, help="On-set referans Excel yolu")
+    wz.add_argument("-o", "--output", default=None, help="On-set cikti YAML yolu")
+    wz.set_defaults(func=_cmd_wizard)
+
+    cw = sub.add_parser(
+        "config-wizard",
+        help="Excel-bagimsiz config sihirbazi: UI uzerinden CalcParams ayarla "
+             "(Saf geometri / yari kesit / ozel)",
+    )
+    cw.add_argument(
+        "-o", "--output", default="profile.yaml",
+        help="Cikti YAML yolu (varsayilan: profile.yaml)",
+    )
+    cw.add_argument(
+        "--preset", default="geometry_full",
+        help="Baslangic preset: geometry_full / geometry_half / custom_template",
+    )
+    cw.add_argument(
+        "--preset-only", action="store_true",
+        help="GUI'siz: sadece preset'i YAML olarak yaz (PySide6 gerektirmez)",
+    )
+    cw.add_argument(
+        "--list-presets", action="store_true",
+        help="Mevcut presetleri listele ve cik",
+    )
+    cw.set_defaults(func=_cmd_config_wizard)
+
+    tp = sub.add_parser(
+        "train-profiles",
+        help="Faz 6: N (cad, reference) ciftinden median trained profile uretir",
+    )
+    tp.add_argument(
+        "--pairs", action="append", required=True, metavar="CAD,REF",
+        help="(virgulle ayrilmis) CAD ve referans Excel cifti; tekrarlanabilir",
+    )
+    tp.add_argument(
+        "--names", default=None,
+        help="(virgulle ayrilmis) proje isimleri; verilmezse CAD stem'i kullanilir",
+    )
+    tp.add_argument(
+        "-o", "--output", default="trained_profile.yaml",
+        help="Cikti trained profile YAML",
+    )
+    tp.add_argument(
+        "--cross-validate", action="store_true",
+        help="Leave-one-out cross-validation (yavas; her proje icin pipeline kosumu)",
+    )
+    tp.set_defaults(func=_cmd_train_profiles)
+
+    sfit = sub.add_parser(
+        "structural-fit",
+        help="DXF + referans Excel'den CalcParams profili otomatik fit eder (Faz 4)",
+    )
+    sfit.add_argument("cad", help="DWG/DXF dosyasi (yapisal cizim)")
+    sfit.add_argument("reference", help="Referans Excel (Kumluca formatinda)")
+    sfit.add_argument(
+        "-o", "--output", default="profile.yaml",
+        help="Cikti YAML yolu (varsayilan: profile.yaml)",
+    )
+    sfit.add_argument(
+        "--base-config", default=None, metavar="YAML",
+        help="Layer overrideleri + signal_hints icin baz config (params fit edilir).",
+    )
+    sfit.set_defaults(func=_cmd_structural_fit)
+
+    ui = sub.add_parser("ui", help="PySide6 grafiksel arayuzu baslat (ana pencere)")
+    ui.add_argument(
+        "--config", default="metraj/config",
+        help="Mimari config klasoru (varsayilan: metraj/config)",
+    )
     ui.set_defaults(func=_cmd_ui)
     return parser
 

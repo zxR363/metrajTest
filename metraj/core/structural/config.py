@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Set
+from typing import Any, Dict, List, Literal, Optional, Set
 
 import yaml
 
@@ -80,6 +80,39 @@ class StructuralConfig:
     validation_tolerance: float = 0.01
     #: YAML ile kiyaslama anahtari takma adlari (``comparison_label_aliases``).
     comparison_label_aliases: Dict[str, str] = field(default_factory=dict)
+    #: ``excel_layout=kumluca`` icin kot on eki kirpilacak etiketler (YAML override);
+    #: bos liste ise gt_io.py icindeki ``KUMLUCA_STRIP_KOT_PREFIX_REST`` default'u kullanilir.
+    strip_kot_prefix_labels: List[str] = field(default_factory=list)
+    #: Faz 1: INSERT (block reference) entity'lerini block tanimindan transform ederek
+    #: polyline/hatch listelerine acsin mi? Kolon/kapi blok kullanan firma cizimlerinde
+    #: gerekli; varsayilan kapali (geri uyum + olasi mukerrer sayim onleme).
+    explode_inserts: bool = False
+    #: Faz 1: Disardaki YAML dosyasi (``signal_hints`` blogu); skor sistemi
+    #: bu dosyadaki ``name_aliases`` ve ``color_hints``'i okur. None ise sadece
+    #: ``score_signal_hints`` inline kullanilir.
+    signal_hints_path: Optional[str] = None
+    #: Faz 1: Inline signal_hints sozlugu (YAML'in eşdeğeri). ``signal_hints_path``
+    #: bir dosyadan okunduktan sonra bu sozluk uzerine MERGE edilir (priorite: inline).
+    signal_hints: Dict[str, Any] = field(default_factory=dict)
+    #: Faz 2: Plan basligi locale ad ("tr" / "en") veya YAML dosyasi yolu.
+    #: None ise default Turkce locale kullanilir.
+    plan_labels_locale: Optional[str] = None
+    #: Faz 2: Plan kumeleme ekseni — "x" (yatay layout, Kumluca default),
+    #: "y" (dusey layout) ya da "auto" (her ikisi denenir).
+    plan_cluster_axis: str = "x"
+    #: Faz 3: Geometrik siniflandirma esikleri (column_max_aspect, wall_min_aspect,
+    #: slab_min_area_m2, vb.) — ``GeometricThresholds.from_dict`` ile yuklenir.
+    geometric_thresholds: Dict[str, float] = field(default_factory=dict)
+    #: Faz 3: ``True`` ise pipeline ``find_classification_conflicts`` calistirir,
+    #: layer-bazli ile geometric_kind uyusmazliklarini result'a ekler.
+    classification_conflict_check: bool = True
+    #: Faz 3: ``True`` ise extractor standalone LINE entity'leri (DXF LINE,
+    #: polyline degil) acik kiris adayi olarak ekler.
+    include_standalone_lines: bool = False
+    #: Faz 5: Proje-bazli kullanici feedback JSON dosyasi (FeedbackStore). Pipeline
+    #: baslangicinda yuklenir, ``structural_layer_include_kind`` /
+    #: ``comparison_label_aliases`` / ``structural_layer_exclude`` uzerine merge edilir.
+    feedback_store_path: Optional[str] = None
     #: Katman adi -> yapisal tur (``ElementKind``), autodetect uzerine yazar.
     structural_layer_include_kind: Dict[str, str] = field(default_factory=dict)
     #: Otomatik bulunsa bile bu katmanlardan geometri cikarma.
@@ -96,7 +129,38 @@ class StructuralConfig:
             candidate = (path.parent / ref).resolve()
             if candidate.is_file():
                 cfg.reference_excel_path = str(candidate)
+        # Faz 1: signal_hints_path goreli ise YAML dosyasi yanindan coz
+        if cfg.signal_hints_path:
+            sp = Path(cfg.signal_hints_path)
+            if not sp.is_absolute():
+                cand = (path.parent / sp).resolve()
+                if cand.is_file():
+                    cfg.signal_hints_path = str(cand)
+        # Faz 5: feedback_store_path benzer cozumleme
+        if cfg.feedback_store_path:
+            fp = Path(cfg.feedback_store_path)
+            if not fp.is_absolute():
+                cand = (path.parent / fp).resolve()
+                cfg.feedback_store_path = str(cand)
         return cfg
+
+    def load_signal_hints(self) -> Dict[str, Any]:
+        """``signal_hints_path`` (dosyadan) + ``signal_hints`` (inline) birlestir.
+
+        Inline blogu dosya uzerine YAZAR (priorite: inline). Hicbir kaynak yoksa
+        bos sozluk doner; skor sistemi sadece ad regex + geometriyle calisir.
+        """
+        out: Dict[str, Any] = {}
+        if self.signal_hints_path:
+            p = Path(self.signal_hints_path)
+            if p.is_file():
+                with open(p, "r", encoding="utf-8") as fh:
+                    loaded = yaml.safe_load(fh) or {}
+                if isinstance(loaded, dict):
+                    out = _deep_merge_mapping(out, loaded)
+        if self.signal_hints:
+            out = _deep_merge_mapping(out, dict(self.signal_hints))
+        return out
 
     @classmethod
     def from_dict(cls, data: dict) -> "StructuralConfig":
@@ -126,6 +190,10 @@ class StructuralConfig:
         if not isinstance(cmp_aliases, dict):
             cmp_aliases = {}
         cmp_aliases = {str(k): str(v) for k, v in cmp_aliases.items()}
+        strip_labels_raw = data.get("strip_kot_prefix_labels") or []
+        if not isinstance(strip_labels_raw, list):
+            strip_labels_raw = []
+        strip_labels = [str(x) for x in strip_labels_raw]
         inc = data.get("structural_layer_include_kind") or {}
         if not isinstance(inc, dict):
             inc = {}
@@ -146,6 +214,32 @@ class StructuralConfig:
             compare_to_reference=compare_ref,
             validation_tolerance=val_tol,
             comparison_label_aliases=cmp_aliases,
+            strip_kot_prefix_labels=strip_labels,
+            explode_inserts=bool(data.get("explode_inserts", False)),
+            signal_hints_path=(
+                str(data["signal_hints_path"])
+                if data.get("signal_hints_path") else None
+            ),
+            signal_hints=(
+                dict(data.get("signal_hints") or {})
+                if isinstance(data.get("signal_hints"), dict) else {}
+            ),
+            plan_labels_locale=(
+                str(data["plan_labels_locale"])
+                if data.get("plan_labels_locale") else None
+            ),
+            plan_cluster_axis=str(data.get("plan_cluster_axis", "x")),
+            geometric_thresholds=(
+                {str(k): float(v) for k, v in (data.get("geometric_thresholds") or {}).items()
+                 if isinstance(v, (int, float))}
+                if isinstance(data.get("geometric_thresholds"), dict) else {}
+            ),
+            classification_conflict_check=bool(data.get("classification_conflict_check", True)),
+            include_standalone_lines=bool(data.get("include_standalone_lines", False)),
+            feedback_store_path=(
+                str(data["feedback_store_path"])
+                if data.get("feedback_store_path") else None
+            ),
             structural_layer_include_kind=inc,
             structural_layer_exclude=exc,
         )

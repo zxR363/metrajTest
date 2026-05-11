@@ -1,0 +1,57 @@
+# Plan basligi locale: Turkce.
+#
+# `plan_labels.parse_plan_title(text, locale=...)` bu sozlugu okur. Her anahtar
+# bir KAT kategorisini temsil eder ve substring eslesmesi (case-insensitive) ile
+# tetiklenir. Birden cok kategori eslesirse priority sirasi `_label_priority`
+# tarafindan belirlenir (multi_kat > basement/ground/roof > n.kat > saf kot).
+#
+# Yeni firma cizimi:
+#   - Plan basligi formati farkliysa (orn. "K-01 ZEMIN PLAN" vs "ZEMIN KAT PLANI")
+#     burada sadece anahtar kelimeler degistir; regex yazmaya gerek yok.
+
+# Ana plan basligi anahtar sozcukleri — "PLAN" / "PLANI" / "PLANLARI" gibi.
+# parse_plan_title bu sozcugun gectigi metinleri plan basligi olarak kabul eder.
+plan_keywords:
+  - PLAN
+  - PLANI
+  - PLANLARI
+
+# Kat kelimesi — "N.KAT", "N.KAT PLANI" gibi.
+floor_keyword:
+  - KAT
+  - KATI
+
+# Bodrum (temel) — extracted label: TEMEL, elevation: storey_h * -1
+basement:
+  - BODRUM
+  - TEMEL
+  - B1
+  - B2
+  # "BODRUM KAT PLANI", "TEMEL KAT PLANI"
+
+# Zemin kat (ground floor) — extracted label: 0,00, elevation: 0
+ground:
+  - ZEMIN
+  - ZEMİN
+  - ZK
+  - GIRIS    # bazi firmalar "GIRIS KAT" diyor
+
+# Cati (roof) — extracted label: CATI, elevation: en ust
+roof:
+  - CATI
+  - ÇATI
+  - TERAS
+
+# "n VE m KAT" multi-floor plan formati anahtar sozcukleri (regex degil).
+# parse_plan_title bunlari kombinasyon icinde arar.
+multi_floor_separator:
+  - VE
+  - ","
+  - "&"
+  - "+"
+
+# Parantez icindeki kot bilgisi anahtarlari (ornek: "(+3.00 KOTU)")
+elevation_marker:
+  - KOT
+  - KOTU
+  - KOTUNDA

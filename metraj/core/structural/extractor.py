@@ -101,6 +101,8 @@ def extract_structural_elements(
     layer_report: Optional[StructuralLayerReport] = None,
     min_polygon_area_m2: float = 0.005,
     layer_always_keep: Optional[Set[str]] = None,
+    *,
+    include_standalone_lines: bool = False,
 ) -> Tuple[List[StructuralElement], StructuralLayerReport]:
     """Modeldeki tum yapisal elemanlari cikar.
 
@@ -174,6 +176,30 @@ def extract_structural_elements(
         elements.append(StructuralElement.from_polygon(
             kind=kind, layer=hatch.layer, polygon=shp,
         ))
+
+    # Faz 3: standalone LINE entity'leri (DXF "LINE", polyline degil) — bazi
+    # firmalar kirisi tek bir LINE olarak ciziyor. Opsiyonel; default kapali
+    # cunku KOLON/PERDE katmaninda da yardimci LINE'lar olabilir, yanlis
+    # eleman uretebilir.
+    if include_standalone_lines:
+        line_kinds_allowed = {"beam"}  # sadece kiris adayi katmanlardan
+        for ln in model.lines:
+            kind = layer_report.layer_to_kind.get(ln.layer)
+            if kind not in line_kinds_allowed:
+                continue
+            primary_list = primary_per_kind.get(kind, [])
+            if primary_list and ln.layer not in primary_list:
+                continue
+            try:
+                ls = LineString([ln.start, ln.end])
+                if ls.length < 0.5:  # cok kisa cizgi kiris degildir (detay)
+                    continue
+                elements.append(StructuralElement(
+                    kind=kind, layer=ln.layer, geom=ls,
+                    area_m2=0.0, perimeter_m=0.0, length_m=ls.length,
+                ))
+            except Exception:
+                continue
 
     # Bilgilendirme
     counts: Dict[str, int] = {}

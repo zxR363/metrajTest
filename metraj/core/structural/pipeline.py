@@ -10,11 +10,15 @@ from ..cad_io.converter import DwgConverter
 from ..cad_io.dxf_reader import DxfReader, RawCadModel, inventory_layers
 from .calculator import StructuralReport, calculate
 from .classify import (
+    ClassificationConflict,
+    GeometricThresholds,
     deduplicate_overlapping_beams,
+    find_classification_conflicts,
     remove_collinear_centroids,
     union_slabs_per_plan,
 )
 from .config import StructuralConfig, default_config
+from .diagnostics import write_diagnostics_json
 from .elements import StructuralElement, StructuralModel
 from .excel_writer import write_kumluca_reference_layout, write_structural_xlsx
 from .extractor import (
@@ -36,6 +40,7 @@ from .layer_detection import (
     apply_structural_layer_overrides,
     detect_structural_layers,
 )
+from .layer_signals import collect_layer_signals
 from .gt_io import (
     ValidationRowDetail,
     compare_reports_full,
@@ -43,7 +48,7 @@ from .gt_io import (
     parse_kumluca_reference,
     snap_report_to_reference,
 )
-from .plan_labels import detect_plan_multipliers, detect_title_anchors
+from .plan_labels import PlanLabelLocale, detect_plan_multipliers, detect_title_anchors
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +73,12 @@ class StructuralPipelineResult:
     excel_path: Optional[Path] = None
     plan_count: int = 0
     notes: List[str] = field(default_factory=list)
+    #: Faz 0 teshis JSON'u (eleman bazinda kind/layer/bbox/aspect_ratio); benchmark
+    #: ve gelecek (Faz 1) siniflandirici icin ortak girdi.
+    diagnostics_path: Optional[Path] = None
+    #: Faz 3: layer-bazli ve geometric_classify uyusmazliklari ("kuskulu siniflandirma").
+    #: Sessiz overwrite YAPILMAZ; element.kind layer-bazli kalir, UI bunlari listeler.
+    classification_conflicts: List["ClassificationConflict"] = field(default_factory=list)
     #: ``compare_to_reference`` aciksa yazilan metin dosyasi (uyari listesi).
     validation_summary_path: Optional[Path] = None
     #: Satir bazinda hesap vs referans (UI tablosu).
@@ -84,13 +95,16 @@ class StructuralPipeline:
     def __init__(self, config: Optional[StructuralConfig] = None) -> None:
         self.config = config or default_config()
         self.dwg_converter = DwgConverter()
-        self.dxf_reader = DxfReader()
+        self.dxf_reader = DxfReader(
+            explode_inserts=getattr(self.config, "explode_inserts", False),
+        )
 
     def run(
         self,
         cad_path: str | Path,
         output_dir: str | Path = "build/structural",
         write_excel: bool = True,
+        write_diagnostics: bool = True,
     ) -> StructuralPipelineResult:
         cad_path = Path(cad_path)
         output_dir = Path(output_dir)
@@ -106,9 +120,31 @@ class StructuralPipeline:
 
         # 2) Yapisal autodetect + kullanici katman overrideleri
         inv = inventory_layers(model)
-        layer_report_ad = detect_structural_layers(model.layers, layer_inventory=inv)
+        # Faz 1: signal_hints YAML/inline + entity istatistikleri ile skor sistemi.
+        # Verilmediyse score_layer cagrilmaz, eski regex davranisi calisir.
+        signal_hints = self.config.load_signal_hints() if hasattr(self.config, "load_signal_hints") else {}
+        layer_sigs = collect_layer_signals(model) if signal_hints else None
+        layer_report_ad = detect_structural_layers(
+            model.layers, layer_inventory=inv,
+            layer_signals=layer_sigs,
+            layer_colors=model.layer_colors or None,
+            signal_hints=signal_hints or None,
+        )
         inc = dict(getattr(self.config, "structural_layer_include_kind", None) or {})
         exc = list(getattr(self.config, "structural_layer_exclude", None) or [])
+        alias_merge = dict(getattr(self.config, "comparison_label_aliases", None) or {})
+        # Faz 5: feedback_store override'larini merge et
+        fb_path = getattr(self.config, "feedback_store_path", None)
+        if fb_path:
+            try:
+                from ..learning.feedback_store import FeedbackStore
+                fb = FeedbackStore.load(fb_path)
+                fb.apply_to_config_dicts(inc, alias_merge, exc)
+                if fb.notes:
+                    logger.info("FeedbackStore notlari (%s): %s",
+                                fb.source_path, "; ".join(fb.notes[:3]))
+            except Exception as e:
+                logger.warning("feedback_store yuklenemedi (%s): %s", fb_path, e)
         layer_report = apply_structural_layer_overrides(
             layer_report_ad,
             include_kind=inc,
@@ -121,6 +157,7 @@ class StructuralPipeline:
             model,
             layer_report=layer_report,
             layer_always_keep=always_keep or None,
+            include_standalone_lines=getattr(self.config, "include_standalone_lines", False),
         )
         logger.info("Ham eleman: %d", len(raw_elements))
         # 3a) Hash bazli hizli dedupe (centroid+alan) — DWG'de plan kopyalari
@@ -140,10 +177,24 @@ class StructuralPipeline:
         # 3e) Reklasifikasyon yok — kategori atamasi calculate()'de plan-bazli
 
         # 4) Plan kumelemesi
+        # Faz 2: locale yukle (dil-agnostik plan basligi parser'i)
+        locale_obj = None
+        if self.config.plan_labels_locale:
+            try:
+                locale_obj = PlanLabelLocale.load(self.config.plan_labels_locale)
+            except Exception as e:
+                logger.warning("plan_labels_locale yuklenemedi (%s): %s",
+                               self.config.plan_labels_locale, e)
+        plan_axis = (self.config.plan_cluster_axis or "x").lower()
+        if plan_axis not in {"x", "y", "auto"}:
+            plan_axis = "x"
         # Once DWG'deki plan basliklarindan x merkezleri cikar (en guvenilir).
+        # Anchor-bazli optimize yol simdilik sadece yatay layout icin aktiftir;
+        # axis='y' veya 'auto' icin detect_plan_groups fallback'ine duser.
         anchors_all = detect_title_anchors(
             model.texts,
             storey_h=self.config.params.typical_storey_height_m,
+            locale=locale_obj,
         )
         # Anchor'lari yapisal polygon X aralığında olanlarla sinirla (hesap
         # tablosu/cerceve metinleri plandan cok uzak X'lerde olabilir).
@@ -165,7 +216,7 @@ class StructuralPipeline:
             anchors = anchors_all
         logger.info("Anchor metni: %d (toplam %d, polygon araligindaki)",
                     len(anchors), len(anchors_all))
-        if len(anchors) >= 2:
+        if plan_axis == "x" and len(anchors) >= 2:
             # Anchor'lara gore plan'lari Voronoi-style olustur: ardisik anchor
             # ortasi sinir
             anchor_xs = [a[0] for a in anchors]
@@ -210,6 +261,7 @@ class StructuralPipeline:
             plans = detect_plan_groups(
                 elements,
                 expected_floor_count=self.config.expected_floor_count,
+                axis=plan_axis,
             )
             attach_floor_labels(plans, model.texts, floor_label_layers=self.config.floor_label_layers)
 
@@ -223,16 +275,22 @@ class StructuralPipeline:
                 plan.elevation_m = info.elevation_m
 
         # 5a) Eleman -> kat ataması (artik plan label'lari set edilmis)
+        # axis="auto" calistirildiysa detect_plan_groups secimi pipeline'da bilinmiyor;
+        # bu durumda "x" varsayilan; auto secim sadece detect_plan_groups icinde
+        # bbox sirasini etkiler — element ataması bbox tabanli oldugu icin tutarli.
+        assign_axis = "x" if plan_axis == "auto" else plan_axis
         floor_plans, unassigned = assign_elements_to_plans(
             elements, plans, config_floors=None,
             typical_storey_height_m=self.config.params.typical_storey_height_m,
+            axis=assign_axis,
         )
 
         # 5b) Plan basligi metinlerinden multiplier ve nihai etiket
         # (anchor'dan gelen etiket cogu zaman dogru, multi-kat bilgisi de
         # buradan gelir)
         detect_plan_multipliers(floor_plans, model.texts,
-                                storey_h=self.config.params.typical_storey_height_m)
+                                storey_h=self.config.params.typical_storey_height_m,
+                                locale=locale_obj)
 
         # Plan label degisikliginden sonra eleman floor_label'larini guncelle
         for fp in floor_plans:
@@ -274,12 +332,33 @@ class StructuralPipeline:
 
         smodel = StructuralModel(floors=floor_plans, unassigned=unassigned)
 
+        # Faz 3: hibrit siniflandirma kontrolu — sessiz overwrite YOK, sadece uyari.
+        classification_conflicts: List[ClassificationConflict] = []
+        if getattr(self.config, "classification_conflict_check", True):
+            th = GeometricThresholds.from_dict(
+                getattr(self.config, "geometric_thresholds", None),
+            )
+            classification_conflicts = find_classification_conflicts(
+                smodel.all_elements(), thresholds=th,
+            )
+            if classification_conflicts:
+                logger.info(
+                    "Hibrit siniflandirma: %d eleman icin layer-bazli ile "
+                    "geometri-bazli kind farkli (kuskulu).",
+                    len(classification_conflicts),
+                )
+
         # 6) Hesap
         report = calculate(smodel, self.config.params)
 
+        # Faz 5: alias_merge zaten config + feedback_store override'larini icerir.
         cmp_aliases = merge_comparison_aliases(
             getattr(self.config, "excel_layout", "generic"),
-            getattr(self.config, "comparison_label_aliases", None),
+            alias_merge,
+        )
+        strip_labels_list = getattr(self.config, "strip_kot_prefix_labels", None) or []
+        strip_labels_fs: Optional[frozenset[str]] = (
+            frozenset(strip_labels_list) if strip_labels_list else None
         )
 
         refp: Optional[Path] = None
@@ -296,6 +375,7 @@ class StructuralPipeline:
                 report = snap_report_to_reference(
                     report, refp, comparison_aliases=cmp_aliases,
                     excel_layout=getattr(self.config, "excel_layout", "generic"),
+                    strip_prefix_labels=strip_labels_fs,
                 )
             else:
                 logger.warning(
@@ -315,6 +395,7 @@ class StructuralPipeline:
                 report, ref_rep, rtol=tol,
                 comparison_aliases=cmp_aliases,
                 excel_layout=getattr(self.config, "excel_layout", "generic"),
+                strip_prefix_labels=strip_labels_fs,
             )
             validation_detail = ValidationCompareSummary(
                 reference_path=refp.resolve(),
@@ -350,7 +431,7 @@ class StructuralPipeline:
                 self.config.reference_excel_path,
             )
 
-        # 7) Excel
+        # 7) Excel + diagnostics JSON (Faz 0)
         excel_path = None
         if write_excel:
             excel_path = output_dir / "yapisal_metraj.xlsx"
@@ -362,6 +443,12 @@ class StructuralPipeline:
             else:
                 write_structural_xlsx(report, excel_path, project_name=self.config.project_name)
 
+        diagnostics_path: Optional[Path] = None
+        if write_diagnostics:
+            diagnostics_path = write_diagnostics_json(
+                smodel, output_dir / "elements_diagnostics.json",
+            )
+
         return StructuralPipelineResult(
             smodel=smodel,
             report=report,
@@ -369,6 +456,8 @@ class StructuralPipeline:
             excel_path=excel_path,
             plan_count=len(floor_plans),
             notes=report.notes,
+            diagnostics_path=diagnostics_path,
+            classification_conflicts=classification_conflicts,
             validation_summary_path=validation_summary_path,
             validation_detail=validation_detail,
             layer_report_autodetect=layer_report_ad,

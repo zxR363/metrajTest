@@ -123,6 +123,7 @@ def comparison_key(
     aliases: Optional[Dict[str, str]] = None,
     *,
     excel_layout: str = "generic",
+    strip_prefix_labels: Optional[frozenset[str]] = None,
 ) -> str:
     """Satir etiketini referans Excel ile eslestirmek icin anahtar uretir.
 
@@ -131,7 +132,8 @@ def comparison_key(
 
     ``excel_layout=kumluca`` ise bazi satirlarda kot on eki (``0,00 ``,
     ``+2,85 `` veya ``CATI ``) kirpilir; Excel'deki kot onsuz blok satirlariyla
-    eslesir.
+    eslesir. Kirpilacak etiketler ``strip_prefix_labels`` ile YAML'dan
+    verilebilir; verilmezse Kumluca varsayilan listesi (geri uyum) kullanilir.
     """
     aliases = aliases or {}
     s = _norm_label(label)
@@ -156,14 +158,15 @@ def comparison_key(
     s = re.sub(r"\d+,\d{2}", _kot_sub, s)
 
     if excel_layout == "kumluca":
+        strip_set = strip_prefix_labels if strip_prefix_labels is not None else KUMLUCA_STRIP_KOT_PREFIX_REST
         m = re.match(r"^(?:\+)?(\d+,\d{2})\s+(.+)$", s)
         if m:
             rest = _norm_label(m.group(2))
-            if rest in KUMLUCA_STRIP_KOT_PREFIX_REST:
+            if rest in strip_set:
                 s = rest
         elif s.startswith("CATI "):
             rest = _norm_label(s[5:])
-            if rest in KUMLUCA_STRIP_KOT_PREFIX_REST:
+            if rest in strip_set:
                 s = rest
 
     return s
@@ -174,6 +177,7 @@ def aggregate_rows_by_comparison_key(
     aliases: Dict[str, str],
     *,
     excel_layout: str = "generic",
+    strip_prefix_labels: Optional[frozenset[str]] = None,
 ) -> Dict[str, CalcRow]:
     """Ayni ``comparison_key`` ile birden cok satir varsa ``total`` (ve qty1) toplanir.
 
@@ -182,7 +186,10 @@ def aggregate_rows_by_comparison_key(
     """
     groups: Dict[str, List[CalcRow]] = {}
     for r in rows:
-        k = comparison_key(r.label, aliases, excel_layout=excel_layout)
+        k = comparison_key(
+            r.label, aliases, excel_layout=excel_layout,
+            strip_prefix_labels=strip_prefix_labels,
+        )
         groups.setdefault(k, []).append(r)
     out: Dict[str, CalcRow] = {}
     for k, lst in groups.items():
@@ -397,6 +404,7 @@ def snap_report_to_reference(
     *,
     comparison_aliases: Optional[Dict[str, str]] = None,
     excel_layout: str = "generic",
+    strip_prefix_labels: Optional[frozenset[str]] = None,
 ) -> StructuralReport:
     """Etiketleri eslesen satirlarda miktarlari referans Excel'e ceker.
 
@@ -407,16 +415,21 @@ def snap_report_to_reference(
     aliases_merged = comparison_aliases or {}
     ref_form_agg = aggregate_rows_by_comparison_key(
         ref.formwork_rows, aliases_merged, excel_layout=excel_layout,
+        strip_prefix_labels=strip_prefix_labels,
     )
     ref_beton_agg = aggregate_rows_by_comparison_key(
         ref.concrete_rows, aliases_merged, excel_layout=excel_layout,
+        strip_prefix_labels=strip_prefix_labels,
     )
     fk: Dict[str, CalcRow] = dict(ref_form_agg.items())
     fb: Dict[str, CalcRow] = dict(ref_beton_agg.items())
 
     matched_k = 0
     for r in computed.formwork_rows:
-        k = comparison_key(r.label, aliases_merged, excel_layout=excel_layout)
+        k = comparison_key(
+            r.label, aliases_merged, excel_layout=excel_layout,
+            strip_prefix_labels=strip_prefix_labels,
+        )
         if k in fk:
             o = fk[k]
             r.qty1 = o.qty1
@@ -427,7 +440,10 @@ def snap_report_to_reference(
 
     matched_b = 0
     for r in computed.concrete_rows:
-        k = comparison_key(r.label, aliases_merged, excel_layout=excel_layout)
+        k = comparison_key(
+            r.label, aliases_merged, excel_layout=excel_layout,
+            strip_prefix_labels=strip_prefix_labels,
+        )
         if k in fb:
             o = fb[k]
             r.qty1 = o.qty1
@@ -452,6 +468,7 @@ def compare_reports_full(
     *,
     comparison_aliases: Optional[Dict[str, str]] = None,
     excel_layout: str = "generic",
+    strip_prefix_labels: Optional[frozenset[str]] = None,
 ) -> Tuple[list[str], float, float, list[ValidationRowDetail]]:
     """Iki raporu satir bazinda karsilastirir; UI icin tum satir detaylari.
 
@@ -464,9 +481,11 @@ def compare_reports_full(
 
     ck = aggregate_rows_by_comparison_key(
         computed.formwork_rows, aliases_merged, excel_layout=excel_layout,
+        strip_prefix_labels=strip_prefix_labels,
     )
     rk = aggregate_rows_by_comparison_key(
         reference.formwork_rows, aliases_merged, excel_layout=excel_layout,
+        strip_prefix_labels=strip_prefix_labels,
     )
 
     def walk(
@@ -564,9 +583,11 @@ def compare_reports_full(
 
     cb = aggregate_rows_by_comparison_key(
         computed.concrete_rows, aliases_merged, excel_layout=excel_layout,
+        strip_prefix_labels=strip_prefix_labels,
     )
     rb = aggregate_rows_by_comparison_key(
         reference.concrete_rows, aliases_merged, excel_layout=excel_layout,
+        strip_prefix_labels=strip_prefix_labels,
     )
     max_b = walk(cb, rb, "BETON", "BETON")
 

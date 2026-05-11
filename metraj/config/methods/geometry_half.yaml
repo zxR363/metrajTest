@@ -1,0 +1,41 @@
+# Preset: KUMLUCA TARZI (yari kesit / iki yuz)
+#
+# Anlam: Bircok turkiye yapisal projesinde gozlemlenen "iki yuz" sayim usulu.
+# Kolon kalibi = cevrenin yarisi (etkin serit), beton = alanin yarisi (cift
+# polyline pratigi). Bu Kumluca yaml'da kullanilan ana scale degerleridir.
+#
+# Kullanim: Excel referans yokken, fakat firma usulu "Kumluca-style" (yari
+# kesit, %50 cikti) olan projeler icin onerilen ilk-vurus.
+
+project_name: "Yari Kesit Usulu (Kumluca tarzi)"
+excel_layout: generic
+compare_to_reference: false
+snap_rows_to_reference: false
+
+params:
+  column_formwork_strip_fraction: 0.5
+  column_concrete_section_fraction: 0.5
+  shear_wall_concrete_section_fraction: 0.5
+  beam_formwork_length_fraction: 0.5
+  beam_concrete_section_fraction: 0.5
+  slab_net_area_fraction: 0.5
+  foundation_plan_formwork_scale: 0.5
+  foundation_concrete_section_fraction: 0.5
+  grobeton_formwork_gt_scale: 0.5
+  parapet_concrete_volume_fraction: 0.5
+  # Asansor: 3 sahti tek kalemde topla (Kumluca tipik)
+  elevator_shaft_quantity_scale: 0.333333333
+
+  # Geometrik sabitler
+  beam_depth_m: 0.45
+  beam_width_m: 0.25
+  slab_thickness_m: 0.15
+  foundation_depth_m: 0.5
+  lean_concrete_thickness_m: 0.10
+  parapet_thickness_m: 0.20
+
+  doseme_net_scale_by_floor_label: {}
+  doseme_concrete_net_scale_by_floor_label: {}
+  beam_formwork_floor_scale: {}
+  beam_concrete_floor_scale: {}
+  parapet_formwork_floor_scale: {}

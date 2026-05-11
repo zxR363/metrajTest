@@ -94,6 +94,10 @@ class RawCadModel:
     hatches: List[CadHatch] = field(default_factory=list)
     layers: List[str] = field(default_factory=list)
     block_definitions: List[str] = field(default_factory=list)
+    #: Faz 1: katman -> ACI renk kodu (1..255). 256 = ByLayer (anlam: cizim sirasinda
+    #: katmanin kendi rengi kullanilmasi gerek; burada katmana atanan rengi tutariz).
+    #: 0 = ByBlock. Bilinmeyen/eksik katmanlar sozlukte bulunmaz.
+    layer_colors: Dict[str, int] = field(default_factory=dict)
 
     def by_layer(self, layer: str) -> "RawCadModel":
         """Return a shallow projection containing entities on a given layer."""
@@ -144,10 +148,22 @@ class DxfReader:
         Output unit for all numeric values.  ``"m"`` matches the Excel
         groundtruth.  Conversions from inches/feet/mm/cm are handled
         automatically using the DXF ``$INSUNITS`` header code.
+    explode_inserts:
+        Faz 1: ``True`` ise her INSERT (block reference) icin block tanimindaki
+        LWPOLYLINE / POLYLINE / CIRCLE / ARC / HATCH geometrileri INSERT'in
+        konumuna gore transform edilerek `polylines` / `hatches` listelerine
+        eklenir; layer = INSERT'in kendi katmanidir. Bu sayede kolon/kapi blok
+        kullanan firma cizimlerinde block icindeki sekiller asagi pipeline'a
+        gorunur. Varsayilan ``False`` (geri uyum).
     """
 
-    def __init__(self, target_unit: str = "m") -> None:
+    def __init__(
+        self,
+        target_unit: str = "m",
+        explode_inserts: bool = False,
+    ) -> None:
         self.target_unit = target_unit
+        self.explode_inserts = explode_inserts
 
     def read(self, dxf_path: str | Path) -> RawCadModel:
         path = Path(dxf_path)
@@ -160,9 +176,18 @@ class DxfReader:
 
         model.layers = sorted({layer.dxf.name for layer in doc.layers})
         model.block_definitions = sorted(b.name for b in doc.blocks if not b.name.startswith("*"))
+        # Faz 1: katman renkleri (ACI). 7 (siyah/beyaz) default; ByLayer'i tutmuyoruz
+        # cunku zaten katmanin kendisi.
+        for lay in doc.layers:
+            try:
+                model.layer_colors[lay.dxf.name] = int(getattr(lay.dxf, "color", 7))
+            except Exception:  # pragma: no cover
+                pass
 
+        self._doc = doc  # _collect_insert -> explode icin gecici referans
         for entity in msp:
             self._dispatch(entity, model, scale)
+        self._doc = None  # type: ignore[assignment]
         logger.info(
             "DXF loaded: %d lines, %d polylines, %d texts, %d blocks, %d hatches "
             "across %d layers (unit=%s -> %s, scale=%.6f)",
@@ -283,6 +308,29 @@ class DxfReader:
                 dynamic_params=dynamic,
             )
         )
+
+        # Faz 1: opsiyonel block-explode. Block tanimindaki LWPOLYLINE/POLYLINE/
+        # CIRCLE/ARC/HATCH alt entity'lerini INSERT transform ile model'e ekler;
+        # alt entity'lerin katmanini INSERT'in katmaniyla override ederiz, cunku
+        # firma cogu zaman block'u STRUCT katmanina yerlestirir ama block icindeki
+        # cizgiler "0" katmaninda olur (ByLayer).
+        if not self.explode_inserts:
+            return
+        try:
+            for sub in entity.virtual_entities():
+                try:
+                    sub.dxf.layer = layer
+                except Exception:
+                    pass
+                # Recursion sonsuz olmasin: nested INSERT'i tekrar explode etmiyoruz
+                # cunku virtual_entities() zaten nested'i acar. Yine de guvenlik
+                # icin INSERT alt-tipini bilek bekkit'le isaretliyoruz.
+                if sub.dxftype() == "INSERT":
+                    continue
+                self._dispatch(sub, model, scale)
+        except Exception:  # pragma: no cover - defensive
+            logger.exception("INSERT explode basarisiz: %s on %s",
+                             entity.dxf.name, layer)
 
     def _collect_hatch(self, entity, model: RawCadModel, scale: float, layer: str) -> None:
         boundary: List[Point] = []

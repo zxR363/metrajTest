@@ -14,10 +14,31 @@ validation_tolerance: 0.01
 snap_rows_to_reference: false
 
 # Ek etiket takmalari (kiyaslama anahtari); rakam kaynagi DWG, Excel yalnizca kiyaslama.
+# Not: ``excel_layout=kumluca`` icin gt_io.py icindeki ``KUMLUCA_DEFAULT_COMPARE_ALIASES``
+# default'u (kot eslemeleri 2,85->3,00 vb. + GROBETON->GRO) zaten aktiftir; buradaki sadece
+# proje-bazli ekleme.
 comparison_label_aliases:
   "0,00 PARAPET": "0,00 PARAPET 30 CM"
 
+# ``excel_layout=kumluca`` icin kot on eki kirpilacak etiketler. Bos birakilirsa gt_io.py
+# icindeki ``KUMLUCA_STRIP_KOT_PREFIX_REST`` default'u kullanilir (geri uyum); asagidaki
+# liste o default ile aynidir, sadece YAML uzerinden override edilebilirlik / gorunurluk icin.
+strip_kot_prefix_labels:
+  - "DOSEME YAN"
+  - "DOSEME BOSLUK MINHA"
+  - "BOSLUK YAN KALIPLARI"
+  - "KOLON YERLERI MINHA"
+  - "KIRIS BIRLESIM MINHA"
+  - "KIRIS BIRLESIMLERI MINHA"
+  - "ASANSOR KULE"
+  - "ASANSOR KULE DOSEME"
+  - "ASANSOR KULE PARAPET 50 CM"
+
 expected_floor_count: 7
+
+# Faz 1: dosya tabanli signal_hints (skor sisteminin renk + ad alias kanali).
+# Kumluca standartlari ile uyumlu sablonun varsayilan yolu.
+signal_hints_path: ../locale/structural_signal_hints.yaml
 
 # Kumluca referans kolon kalip satiri (etkin serit); tam cevre yerine 0.5.
 # Beton kesit toplami GT ile uyum (cift polyline / Excel metraj pratigi).

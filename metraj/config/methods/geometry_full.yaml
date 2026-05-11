@@ -1,0 +1,45 @@
+# Preset: SAF GEOMETRI (hepsi 1.0)
+#
+# Anlam: Cizimin geometrisinden cikan ham metraj — hicbir firma usulu carpani
+# uygulanmaz. Kolon kalibi = TAM cevre, beton = TAM kesit alani, kiris kalibi =
+# TAM uzunluk, doseme alan = NET hesaplanan alan (eksiltmesiz).
+#
+# Kullanim: kullanici hicbir firma usulune bagli kalmadan "salt geometrik"
+# metraj istedigi durumda. Cikan rakamlar firmalarin metraj tablolariyla %50-
+# %100 farkli olabilir cunku metraj usulu UYGULANMIYOR. Asil ham olcum:
+# beton hacmi gercek geometriden hesaplanir (kiris dahil), kalip ise tum
+# yuzeyleri sayar.
+
+project_name: "Saf Geometri"
+excel_layout: generic
+compare_to_reference: false
+snap_rows_to_reference: false
+
+params:
+  # Tum scale alanlari 1.0 (default zaten 1.0 ama acik yazilarak gosteriyoruz)
+  column_formwork_strip_fraction: 1.0       # KOLON kalip = tam cevre x kat yuk
+  column_concrete_section_fraction: 1.0      # KOLON beton = tam kesit alani x kat yuk
+  shear_wall_concrete_section_fraction: 1.0  # PERDE beton = tam kesit alani x kat yuk
+  beam_formwork_length_fraction: 1.0         # KIRIS kalip = tam uzunluk x derinlik
+  beam_concrete_section_fraction: 1.0        # KIRIS beton = polygon alani x derinlik
+  slab_net_area_fraction: 1.0                # DOSEME = net alan (eksiltmesiz)
+  foundation_plan_formwork_scale: 1.0
+  foundation_concrete_section_fraction: 1.0
+  grobeton_formwork_gt_scale: 1.0
+  parapet_concrete_volume_fraction: 1.0
+  elevator_shaft_quantity_scale: 1.0         # Her sahti ayri olarak say
+
+  # Geometrik sabitler (DXF'te degil, kullanici tahmini)
+  beam_depth_m: 0.45
+  beam_width_m: 0.25
+  slab_thickness_m: 0.15
+  foundation_depth_m: 0.5
+  lean_concrete_thickness_m: 0.10
+  parapet_thickness_m: 0.20
+
+  # Kat-bazli ince ayar yok (saf geometri)
+  doseme_net_scale_by_floor_label: {}
+  doseme_concrete_net_scale_by_floor_label: {}
+  beam_formwork_floor_scale: {}
+  beam_concrete_floor_scale: {}
+  parapet_formwork_floor_scale: {}

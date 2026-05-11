@@ -1,0 +1,46 @@
+# Plan title locale: English.
+#
+# See plan_labels_tr.yaml for schema details. Override these keys for projects
+# drawn in English (e.g. "GROUND FLOOR PLAN", "1ST FLOOR (+3.00 LEVEL)").
+
+plan_keywords:
+  - PLAN
+  - PLANS
+  - LAYOUT
+
+floor_keyword:
+  - FLOOR
+  - LEVEL
+  - STORY
+  - STOREY
+
+basement:
+  - BASEMENT
+  - B1
+  - B2
+  - SUBGROUND
+
+ground:
+  - GROUND
+  - GF
+  - LEVEL 0
+  - ENTRANCE
+
+roof:
+  - ROOF
+  - TERRACE
+  - PENTHOUSE
+
+multi_floor_separator:
+  - AND
+  - "&"
+  - ","
+  - "+"
+  - TO
+
+elevation_marker:
+  - LEVEL
+  - LVL
+  - ELEV
+  - ELEVATION
+  - "EL."

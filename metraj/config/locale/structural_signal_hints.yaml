@@ -1,0 +1,95 @@
+# Faz 1: Yapisal katman ipuclari sablonu.
+#
+# YAPISAL CIZIMLERDE FIRMAYA OZEL KATMAN ADLARI / RENKLERI:
+# Bu dosya `score_layer` icin yardimci sinyallerdir; ad regex (KOLON|COLUMN|...)
+# eslemese bile burada listelenen alias/renk eslesirse o ElementKind icin skora
+# katki olur. Tipik akis:
+#
+#   1) Bir firma cizimini ilk acislida `metraj inventory --autodetect-layers`
+#      cikarir; "unmatched" katmanlari incele.
+#   2) O katmanlarin firma anlami biliniyorsa (orn. "K1, K2, K3" = kolon, renk
+#      kirmizi) bu dosyaya eklenir.
+#   3) Pipeline yeniden calistirildiginda skor sistemi artik bu katmanlari
+#      kindlere atayabilir.
+#
+# Skor agirliklari (layer_detection.py icinde):
+#   name_aliases  : 0.5
+#   color_hints   : 0.3
+#   geometric     : 0.4 (otomatik; bu YAML'da yok)
+#   regex (mevcut): 0.6
+#   threshold     : 0.5  (skor < 0.5 ise unmatched kalir)
+
+# ===========================================================================
+# AD ALIAS LISTESI
+# ===========================================================================
+# Bir katman adi (case-insensitive substring) bu listede gecerse +0.5 skor.
+# ElementKind degerleri: column, shear_wall, beam, slab, slab_opening, foundation,
+# lean_concrete, protection, roof_slab, parapet, stair, elevator_shaft, chimney.
+
+name_aliases:
+  column:
+    - "K1"
+    - "K2"
+    - "K3"
+    - "S COLS"
+    - "BETONARME KOLON"
+    - "SP-COL"
+    - "STRUCT_COLUMN"
+
+  shear_wall:
+    - "S WALL"
+    - "P1"
+    - "P2"
+    - "STRUCT_WALL"
+    - "BETONARME PERDE"
+
+  beam:
+    - "S BEAMS"
+    - "B1"
+    - "B2"
+    - "K_PRY"        # bazi firmalar Kiris icin K_PRY
+    - "STRUCT_BEAM"
+
+  slab:
+    - "DSME"
+    - "DOSME"
+    - "FLOOR_SLAB"
+    - "STRUCT_SLAB"
+
+  foundation:
+    - "TEMEL DUZ"
+    - "TEMEL DÜZ"
+    - "RADYE TEMEL"
+    - "FOUNDATION_MAT"
+
+  lean_concrete:
+    - "GROBET"
+    - "LEAN"
+
+  parapet:
+    - "BARIYER"
+
+  elevator_shaft:
+    - "ASANSOR BOSL"
+    - "LIFT SHAFT"
+
+# ===========================================================================
+# RENK IPUCLARI (ACI kodu)
+# ===========================================================================
+# AutoCAD ACI palet: 1=kirmizi, 2=sari, 3=yesil, 4=cyan, 5=mavi, 6=magenta,
+# 7=beyaz/siyah. 8-255 derecelendirmeler. Firma standardina gore renk
+# yapisal kindler arasinda guclu ayrim sinyalidir.
+#
+# Birden cok kind ayni renge sahip olabilir (orn. iki firma farkli sema kullanir);
+# bu yuzden renk tek basina karar vermez, sadece +0.3 skor verir.
+
+color_hints:
+  # Kumluca standardi (gozlemlenen):
+  column: [2]          # sari
+  shear_wall: [4]      # cyan
+  beam: [1, 12, 13]    # kirmizi tonlari
+  slab: [3, 92]        # yesil tonlari
+  foundation: [6, 240] # magenta / koyu mavi
+  lean_concrete: [240]
+  parapet: [9, 255, 151]
+  elevator_shaft: [205]

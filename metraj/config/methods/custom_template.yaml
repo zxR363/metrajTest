@@ -1,0 +1,79 @@
+# Preset: OZEL FIRMA SABLON
+#
+# Bu sablon, kullanicinin elinde referans Excel olmadigi durumlarda
+# `metraj config-wizard` ile UI uzerinden doldurabilecegi taban dosyadir.
+# Tum scale degerleri 1.0 (saf geometri) baslangici; UI'da ayarlanip
+# tarihli kayit yapilir.
+
+project_name: "Yeni Firma Profili"
+excel_layout: generic
+compare_to_reference: false
+snap_rows_to_reference: false
+
+params:
+  # ============================================================
+  # KOLON (column)
+  # ============================================================
+  # Kolon kalibi: tam cevre mi (1.0) yoksa yari mi (0.5)?
+  # - 1.0: Tum yuzler sayilir (cevre x kat yuksekligi)
+  # - 0.5: Iki taraf serit (yarim cevre)
+  column_formwork_strip_fraction: 1.0
+  # Kolon beton kesit alani carpani
+  column_concrete_section_fraction: 1.0
+
+  # ============================================================
+  # PERDE (shear_wall)
+  # ============================================================
+  shear_wall_concrete_section_fraction: 1.0
+
+  # ============================================================
+  # KIRIS (beam)
+  # ============================================================
+  # Kiris derinligi (m) - dosememe alti yuksekligi
+  beam_depth_m: 0.45
+  # Kiris genisligi (m) - alt yuz icin
+  beam_width_m: 0.25
+  # Kiris kalip carpani (1.0 = tum uzunluk, 0.5 = sadece yari)
+  beam_formwork_length_fraction: 1.0
+  # Kiris beton kesit alani carpani
+  beam_concrete_section_fraction: 1.0
+
+  # ============================================================
+  # DOSEME (slab)
+  # ============================================================
+  # Doseme kalinligi (m)
+  slab_thickness_m: 0.15
+  # Doseme net alan carpani (eksiltmeler dahil mi?)
+  slab_net_area_fraction: 1.0
+
+  # ============================================================
+  # TEMEL & GROBETON
+  # ============================================================
+  foundation_depth_m: 0.5
+  foundation_plan_formwork_scale: 1.0
+  foundation_concrete_section_fraction: 1.0
+  lean_concrete_thickness_m: 0.10
+  grobeton_formwork_gt_scale: 1.0
+
+  # ============================================================
+  # PARAPET
+  # ============================================================
+  parapet_thickness_m: 0.20
+  parapet_concrete_volume_fraction: 1.0
+
+  # ============================================================
+  # ASANSOR / BACA
+  # ============================================================
+  # 1.0 = her sahti ayri kalem; 0.333 = uc sahti tek kalemde topla
+  elevator_shaft_quantity_scale: 1.0
+
+  # ============================================================
+  # KAT-BAZLI INCE AYAR (opsiyonel)
+  # ============================================================
+  # Kullanici belirli katlarda farkli carpan istiyorsa:
+  # doseme_net_scale_by_floor_label:
+  #   "0,00": 1.0
+  #   "+2,85": 1.05
+  doseme_net_scale_by_floor_label: {}
+  beam_formwork_floor_scale: {}
+  parapet_formwork_floor_scale: {}

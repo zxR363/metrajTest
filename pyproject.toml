@@ -34,3 +34,8 @@ metraj = [
   "config/*.yaml",
   "config/references/*.yaml",
 ]
+
+[tool.pytest.ini_options]
+markers = [
+  "slow: uctan uca pipeline kosumu (Kumluca DXF gibi buyuk fixture'lar); 'pytest -m \"not slow\"' ile atlanir.",
+]

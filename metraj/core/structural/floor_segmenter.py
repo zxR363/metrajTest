@@ -52,11 +52,12 @@ class FloorAssignment:
     elevation_m: Optional[float] = None
 
 
-def _cluster_x(values: Sequence[float], gap_factor: float = 1.2) -> List[Tuple[float, float]]:
-    """1B kumelemeli x araliklarini bulur.
+def _cluster_axis(values: Sequence[float], gap_factor: float = 1.2) -> List[Tuple[float, float]]:
+    """1B kumeleme: tek bir eksende deger kumeleri bulur.
 
-    `gap_factor`: bir bosluk medyan_aralik * gap_factor'tan buyukse, kume
-    siniri olarak kabul edilir.
+    ``gap_factor``: bir bosluk medyan_aralik * gap_factor'tan buyukse kume
+    siniri olarak kabul edilir. ``Faz 2``: eksen-bagimsiz, hem x hem y icin
+    kullanilir.
     """
     if not values:
         return []
@@ -80,6 +81,10 @@ def _cluster_x(values: Sequence[float], gap_factor: float = 1.2) -> List[Tuple[f
     return [(c[0], c[-1]) for c in clusters]
 
 
+# Geri uyum icin eski ad da kullanilabilir; iceride ayni fonksiyondur.
+_cluster_x = _cluster_axis
+
+
 def _bbox_of_polygons(polys) -> Tuple[float, float, float, float]:
     bounds = [p.bounds for p in polys if p is not None]
     if not bounds:
@@ -92,16 +97,40 @@ def _bbox_of_polygons(polys) -> Tuple[float, float, float, float]:
     )
 
 
+def _select_axis_auto(
+    centroids: List[Tuple[float, float, "StructuralElement"]],
+    expected_floor_count: Optional[int],
+) -> str:
+    """``axis='auto'`` icin x ve y eksenlerini deneyip ``expected_floor_count``'a
+    yakin olan ekseni doner. Beklenti yoksa kume sayisi cok olan eksen secilir.
+    """
+    xs = [c[0] for c in centroids]
+    ys = [c[1] for c in centroids]
+    n_x = len(_cluster_axis(xs))
+    n_y = len(_cluster_axis(ys))
+    if expected_floor_count:
+        if abs(n_x - expected_floor_count) <= abs(n_y - expected_floor_count):
+            return "x"
+        return "y"
+    return "x" if n_x >= n_y else "y"
+
+
 def detect_plan_groups(
     elements: Sequence[StructuralElement],
     expected_floor_count: Optional[int] = None,
     min_elements_per_group: int = 3,
+    *,
+    axis: str = "x",
 ) -> List[FloorAssignment]:
     """Tum yapisal elemanlardan kat plan kumelerini cikarir.
 
-    Plan kumeleri x ekseninde ardisik gruplara ayrilir; her grup bir kat
-    plani olarak yorumlanir.  Sonuc bir bbox listesidir; etiket sonra
+    Plan kumeleri ``axis`` ekseninde ardisik gruplara ayrilir; her grup bir
+    kat plani olarak yorumlanir. Sonuc bir bbox listesidir; etiket sonra
     text-overlay aramasi ile eklenir.
+
+    Faz 2: ``axis``: ``"x"`` (yatay layout, Kumluca default), ``"y"`` (dusey
+    layout), ya da ``"auto"`` (her iki yon denenir, ``expected_floor_count``'a
+    yakin olan secilir).
     """
     centroids = []
     for el in elements:
@@ -113,33 +142,42 @@ def detect_plan_groups(
     if not centroids:
         return []
 
-    xs = [c[0] for c in centroids]
-    x_clusters = _cluster_x(xs)
+    if axis not in {"x", "y", "auto"}:
+        logger.warning("detect_plan_groups: bilinmeyen axis=%r, 'x' kullaniliyor", axis)
+        axis = "x"
+    if axis == "auto":
+        axis = _select_axis_auto(centroids, expected_floor_count)
+        logger.info("detect_plan_groups: axis='auto' -> '%s' secildi", axis)
+
+    coord_index = 0 if axis == "x" else 1
+    coords = [c[coord_index] for c in centroids]
+    axis_clusters = _cluster_axis(coords)
 
     # Eger expected'a yakin degilse, gap_factor'u arttirip yeniden dene
-    if expected_floor_count and abs(len(x_clusters) - expected_floor_count) > 0:
+    if expected_floor_count and abs(len(axis_clusters) - expected_floor_count) > 0:
         candidates = []
         for f in [round(0.5 + i * 0.1, 2) for i in range(50)]:  # 0.5..5.4
-            try_clusters = _cluster_x(xs, gap_factor=f)
+            try_clusters = _cluster_axis(coords, gap_factor=f)
             candidates.append((abs(len(try_clusters) - expected_floor_count), f, try_clusters))
             if len(try_clusters) == expected_floor_count:
-                x_clusters = try_clusters
-                logger.info("Plan kumesi gap_factor=%s ile %d kume bulundu", f, len(try_clusters))
+                axis_clusters = try_clusters
+                logger.info("Plan kumesi gap_factor=%s ile %d kume bulundu (axis=%s)",
+                            f, len(try_clusters), axis)
                 break
         else:
             # Tam eslesme yok; en yakin
             candidates.sort()
             _, best_f, best_cl = candidates[0]
-            x_clusters = best_cl
-            logger.info("Plan kumesi gap_factor=%s ile %d kume (beklenen=%d)",
-                        best_f, len(best_cl), expected_floor_count)
+            axis_clusters = best_cl
+            logger.info("Plan kumesi gap_factor=%s ile %d kume (beklenen=%d, axis=%s)",
+                        best_f, len(best_cl), expected_floor_count, axis)
 
     # Her kume icin bbox + eleman sayisi cikar
     raw_assignments: List[Tuple[FloorAssignment, int]] = []
-    for x_lo, x_hi in x_clusters:
+    for lo, hi in axis_clusters:
         polys_in = [
             el.geom for x, y, el in centroids
-            if x_lo - 0.001 <= x <= x_hi + 0.001
+            if lo - 0.001 <= (x if axis == "x" else y) <= hi + 0.001
         ]
         if len(polys_in) < min_elements_per_group:
             continue
@@ -149,17 +187,20 @@ def detect_plan_groups(
     # Eger hala fazla kume varsa, en kucuk eleman sayili olanlari at
     # (gercek planlar yapisal eleman sayisi acisindan birbirine yakin
     # olmaya egilimlidir; kucuk kumeler genelde detay/gorunus parcalari)
+    bbox_axis_idx = 0 if axis == "x" else 1  # bbox tuple icinde minx=0, miny=1
     if expected_floor_count and len(raw_assignments) > expected_floor_count:
-        # Eleman sayisina gore azalan sirala, ilk N'i tut, sonra x'e gore sirala
+        # Eleman sayisina gore azalan sirala, ilk N'i tut, sonra eksen sirasiyla sirala
         raw_assignments.sort(key=lambda x: x[1], reverse=True)
         kept = raw_assignments[:expected_floor_count]
-        kept.sort(key=lambda x: x[0].bbox[0])
+        kept.sort(key=lambda x: x[0].bbox[bbox_axis_idx])
         assignments = [a for a, _ in kept]
         dropped = raw_assignments[expected_floor_count:]
         logger.info("Plan kume budamasi: %d kume tutuldu, %d kume atildi (kucuk).",
                     len(assignments), len(dropped))
     else:
         assignments = [a for a, _ in raw_assignments]
+        # Eksen sirasiyla sirala (yatay -> sol-sag, dusey -> alt-ust)
+        assignments.sort(key=lambda a: a.bbox[bbox_axis_idx])
 
     logger.info("Tespit edilen plan kumesi sayisi: %d (beklenen=%s)",
                 len(assignments), expected_floor_count)
@@ -238,17 +279,25 @@ def assign_elements_to_plans(
     plans: List[FloorAssignment],
     config_floors: Optional[List[Dict[str, float]]] = None,
     typical_storey_height_m: float = 2.85,
+    *,
+    axis: str = "x",
 ) -> Tuple[List[FloorPlan], List[StructuralElement]]:
-    """Her elemani x merkezine gore en uygun plan kumesine yerlestirir.
+    """Her elemani ``axis`` ekseninde en uygun plan kumesine yerlestirir.
 
-    `config_floors`: Eger kullanici elle "TEMEL,0.00,3.00,..." vermisse,
+    ``axis``: ``"x"`` (yatay layout) veya ``"y"`` (dusey layout). Plan'lar
+    eksen sirasiyla siralanir (sol-sag veya alt-ust).
+
+    ``config_floors``: Eger kullanici elle "TEMEL,0.00,3.00,..." vermisse,
     plan sayisi ile eslesirse o etiketler kullanilir; eslesmezse otomatik.
     """
     if not plans:
         return [], list(elements)
 
-    # Plan kumelerini sol-saga sirala (bu da en alttan en uste varsayimi)
-    sorted_plans = sorted(plans, key=lambda p: p.bbox[0])
+    if axis not in {"x", "y"}:
+        axis = "x"
+    bbox_axis_idx = 0 if axis == "x" else 1
+    # Plan kumelerini eksen sirasiyla sirala (x:sol-sag / y:alt-ust)
+    sorted_plans = sorted(plans, key=lambda p: p.bbox[bbox_axis_idx])
 
     # Config etiketleri varsa, sayilari esitse uygula
     if config_floors and len(config_floors) == len(sorted_plans):
@@ -279,11 +328,13 @@ def assign_elements_to_plans(
         except Exception:
             unassigned.append(el)
             continue
-        # Hangi planin x araliginda?
+        c_axis = cx if axis == "x" else cy
+        # Hangi planin eksen araliginda?
         chosen: Optional[FloorPlan] = None
         for fp in floor_plans:
-            xmin, _, xmax, _ = fp.bbox
-            if xmin - 0.001 <= cx <= xmax + 0.001:
+            lo = fp.bbox[bbox_axis_idx]
+            hi = fp.bbox[bbox_axis_idx + 2]
+            if lo - 0.001 <= c_axis <= hi + 0.001:
                 chosen = fp
                 break
         if chosen is None:
@@ -291,11 +342,12 @@ def assign_elements_to_plans(
             best = None
             best_dist = float("inf")
             for fp in floor_plans:
-                xmin, _, xmax, _ = fp.bbox
-                if cx < xmin:
-                    d = xmin - cx
-                elif cx > xmax:
-                    d = cx - xmax
+                lo = fp.bbox[bbox_axis_idx]
+                hi = fp.bbox[bbox_axis_idx + 2]
+                if c_axis < lo:
+                    d = lo - c_axis
+                elif c_axis > hi:
+                    d = c_axis - hi
                 else:
                     d = 0.0
                 if d < best_dist:
