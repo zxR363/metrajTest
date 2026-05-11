@@ -1,51 +1,58 @@
-2. UI komutu
-Ana pencereyi açmak için:
+✅ Ana UI'a Entegre Edildi
+155/155 test geçti. Sihirbazlar artık ana pencerede.
 
+Ne yapıldı
+Ana pencerede (metraj ui) CAD/mod seçici satırının altına yeni "Yapısal Profil" satırı eklendi:
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ [CAD: proje.dxf ▼] [Çıktı: build/] [Mod: Yapısal ▼] [☐ Ref Excel] [Çalıştır]│
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Yapısal Profil: (default: kumluca.yaml)                                      │
+│   [YAML Yükle...]  [Yeni Profil (UI)...]  [Excel ile Kalibre Et...]         │
+│   [Default'a Dön]                                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+4 buton, tek pencerede tüm akış
+Buton	İşlev	Hangi sihirbazı açar
+"YAML Yükle..."	Diskten önceden hazırlanmış profil seç	QFileDialog
+"Yeni Profil (UI)..."	Excel-bağımsız config sihirbazı	StructuralConfigDialog (8 sekme + dict + override)
+"Excel ile Kalibre Et..."	Auto-fit sihirbazı	CalibrationWizard (5 adım; CAD ve referans pre-fill)
+"Default'a Dön"	Aktif profili sıfırla, kumluca.yaml'a dön	—
+Akış mantığı
+Mod Yapısal veya Otomatik seçildiğinde profil paneli aktif olur; Mimari'de pasif (gri).
+Sihirbazlardan biri çalıştırılınca kaydet sonrası, dialog'un yazdığı YAML otomatik aktif profil olur.
+Label renkli güncellenir: (default) → gri; aktif profil → yeşil bold + dosya adı + proje adı.
+"Çalıştır" basıldığında _struct_config_for_ui() aktif profili öncelikli yükler; yoksa kumluca.yaml default'u.
+Referans Excel + tolerans checkbox'ı hâlâ üstte; aktif profile ek olarak doğrulama açılabilir (iki paralel mekanizma birlikte çalışır).
+Otomatik dosya yolu önerisi
+CAD seçili ise:
+
+Yeni profil için varsayılan: <cad_klasoru>/<cad_adi>.profile.yaml
+Aksi halde: <output_dir>/profile.yaml
+Pre-fill akışı
+"Excel ile Kalibre Et" butonu basıldığında:
+
+Ana pencerede CAD seçilmiş → sihirbaza pre-fill edilir
+Referans Excel checkbox aktifse → o da pre-fill edilir
+Kullanıcı sihirbazda dosya seçmek zorunda kalmaz, sadece adımları geçer
+UI çalıştırma komutu
 
 /Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14 -m metraj.cli ui
-veya kısaltma (path'in PATH'inde varsa):
+veya kısaca:
 
 
 python3.14 -m metraj.cli ui
-Ana pencerede neler var:
-
-DWG/DXF dosya seçici
-Çıkış klasörü seçici
-Mod seçimi: {Otomatik, Mimari, Yapısal}
-Çalıştır butonu
-9 sekme:
-2D Plan — duvar/mahal/açıklık görüntüleyici
-Mahal Listesi — kat, kod, ad, alan, çevre, yükseklik, kapı/pencere sayısı
-Açıklıklar — kapı/pencere tablosu
-İcmal — Poz aggregation
-Yapısal Özet — HTML tablo (kat dağılımı, eleman sayıları)
-Kalıp/Beton — yapısal sonuçlar (m², m³)
-Yapısal Katmanlar — manuel layer kind override
-Doğrulama — hesap vs GT (renk kodlu: yeşil OK, kırmızı eşik üstü)
-Uyarılar — autodetect unmatched + config gaps
-Sihirbazlar (yardımcı GUI'ler)
-
-# 1. Excel ile auto-fit (Faz 4)
-python3.14 -m metraj.cli wizard --cad proje.dxf --reference ref.xlsx -o profile.yaml
-
-# 2. Excel-bağımsız: kullanıcı UI'dan çarpan girer (yeni eklenti)
-python3.14 -m metraj.cli config-wizard -o profile.yaml
-
-# 3. GUI'siz: hızlı preset
-python3.14 -m metraj.cli config-wizard --preset geometry_full --preset-only -o saf.yaml
-Tipik kullanım (kullanıcı senaryosu)
-
-# Excel'i yok: UI'dan çarpan ayarla
-python3.14 -m metraj.cli config-wizard -o /tmp/proje1.yaml
-
-# Profili ana pencerede uygula veya CLI'den koştur
-python3.14 -m metraj.cli run --mode structural --structural-config /tmp/proje1.yaml proje.dxf -o build/
-
-# Ya da ana pencereden GUI ile her şeyi yap (DWG seç + Çalıştır)
-python3.14 -m metraj.cli ui
-Bir ek not: metraj ui komutunda --config parametresinin eksik olduğunu fark ettim ve düzelttim — varsayılan olarak metraj/config klasörünü kullanır, kullanıcı isterse --config /başka/klasör ile override edebilir.
-
-
+Kullanıcı senaryosu
+Ana pencereyi aç (metraj ui)
+CAD dosyasını seç (DWG/DXF)
+Mod: Yapısal
+Profil panelinden tercih et:
+Excel'in var → "Excel ile Kalibre Et" (auto-fit %0.23 KALIP / %9 BETON)
+Excel'in yok → "Yeni Profil (UI)" → 8 sekme (Kolon/Perde/Kiriş/Döşeme/Temel/Parapet+Asansör/Minha/Çatı) + kat-bazlı dict + katman override
+Hazır YAML'ın var → "YAML Yükle"
+"Metraj Çalıştır" — aktif profil kullanılır
+Sekmelerden sonuçları gör: 2D Plan, Kalıp/Beton, Yapısal Özet, Doğrulama, Uyarılar
+Artık config-wizard ve calibration_wizard ayrı tool değil, ana UI'nın doğal parçası.
 
 Kullanıcının ihtiyacının özeti
 Önceki sınır	Şimdiki çözüm

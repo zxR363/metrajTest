@@ -4,42 +4,53 @@
 
 ---
 
-## STATUS (güncel): Faz 0-7 + Calibration Wizard + Excel-Bağımsız Config Wizard tamamlandı ✓
+## STATUS (güncel): Roadmap tamamlandı + Sihirbazlar ana UI'a entegre edildi ✓
 
-**Roadmap'in 8 fazı (0-7) tamamlandı; üzerine iki büyük eklenti yapıldı: (i) GUI Calibration Wizard, (ii) Excel-bağımsız Config Wizard.** Detaylar [§ 12 Faz 0-7 Sonuç Özeti](#12-faz-0-7-sonuç-özeti) ve [§ 13 Excel-Bağımsız Mod](#13-excel-bağımsız-mod) bölümlerinde.
+**Roadmap'in 8 fazı (0-7) tamamlandı; üzerine 3 büyük eklenti yapıldı: (i) GUI Calibration Wizard, (ii) Excel-bağımsız Config Wizard (8 sekme + dict editör + katman override), (iii) Ana UI Entegrasyonu (sihirbazlar tek pencerede).** Detaylar:
+- [§ 12 Faz 0-7 Sonuç Özeti](#12-faz-0-7-sonuç-özeti)
+- [§ 13 Excel-Bağımsız Mod](#13-excel-bağımsız-mod)
+- [§ 14 Ana UI Entegrasyonu](#14-ana-ui-entegrasyonu) (en yeni)
 
 | Metrik | Roadmap başı | Şimdiki durum | Δ |
 |---|---:|---:|---:|
-| Test sayısı | 21 | **149** | +610% |
+| Test sayısı | 21 | **155** | +638% |
 | Kumluca KALIP sapma (elle kalibre) | %0.476 | %0.476 | 0 (regression yok) |
 | Kumluca KALIP sapma (auto-fit) | yok | **%0.23** | yeni — elle yazılan kalibreyi geçti |
 | Kumluca BETON sapma (auto-fit) | yok | %9.0 | yeni |
 | Saf geometri çıktısı (Excel'siz) | yok | **mümkün** | yeni — `metraj config-wizard` |
 | CLI komutları | 6 | **17** | +11 |
-| Otomatize CalcParams alanı | 0 | **9 global + 5 dict** | yeni |
+| UI kullanıcı-ayarlanabilir CalcParams | 0 | **26 spinbox + 7 dict + katman override** | yeni |
 | Hazır preset YAML | 0 | **3** (`geometry_full`, `geometry_half`, `custom_template`) | yeni |
-| Test süresi (slow dahil) | — | **22sn** (session fixture cache) | — |
+| Test süresi (slow dahil) | — | **~25-35sn** (session fixture cache) | — |
+
+### Tek-pencere kullanıcı akışı (en yeni eklenti)
+
+Kullanıcı `metraj ui` ile **ana pencereyi** açar; tüm akış orada:
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ [CAD: proje.dxf ▼] [Çıktı: build/] [Mod: Yapısal ▼] [☐ Ref Excel] [Çalıştır]│
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Yapısal Profil: (default: kumluca.yaml)                                      │
+│   [YAML Yükle...]  [Yeni Profil (UI)...]  [Excel ile Kalibre Et...]         │
+│   [Default'a Dön]                                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+Sihirbazlar artık **ayrı tool değil**, ana UI'nın doğal parçası. Detay: [§ 14](#14-ana-ui-entegrasyonu).
 
 ### İki paralel kalibrasyon yolu
 
 **Yol A — Referans Excel ile (auto-fit):**
-```bash
-metraj wizard --cad proje.dxf --reference ref.xlsx -o profile.yaml      # GUI 10 dk
-# veya CLI
-metraj structural-fit proje.dxf ref.xlsx -o profile.yaml                # 30 sn
-metraj run --mode structural --structural-config profile.yaml proje.dxf
-```
-Beklenen sapma: KALIP <%1, BETON <%10.
+- Ana UI'da: **"Excel ile Kalibre Et..."** butonu (CalibrationWizard açılır)
+- CLI: `metraj wizard --cad proje.dxf --reference ref.xlsx -o profile.yaml`
+- Beklenen sapma: KALIP <%1, BETON <%10
 
-**Yol B — Excel'siz (kullanıcı UI'dan çarpanları girer):**
-```bash
-metraj config-wizard -o profile.yaml                                    # GUI
-# veya CLI hızlı preset
-metraj config-wizard --preset geometry_full --preset-only -o saf.yaml   # Saf geometri (hepsi 1.0)
-metraj config-wizard --preset geometry_half --preset-only -o yari.yaml  # Yarı kesit (hepsi 0.5)
-metraj run --mode structural --structural-config profile.yaml proje.dxf
-```
-Çıktı: kullanıcı parametrelerine sadık (firma metraj usulüne göre değil, geometriden + kullanıcı çarpanlarıyla).
+**Yol B — Excel'siz (kullanıcı UI'dan tüm çarpanları girer):**
+- Ana UI'da: **"Yeni Profil (UI)..."** butonu (StructuralConfigDialog: 8 sekme)
+- CLI: `metraj config-wizard -o profile.yaml`
+- CLI hızlı preset: `metraj config-wizard --preset geometry_full --preset-only -o saf.yaml`
+- Çıktı: kullanıcı parametrelerine sadık (firma metraj usulüne göre değil)
 
 ### Öğrenme döngüsü
 
@@ -49,7 +60,7 @@ metraj train-profiles --pairs c1,r1 --pairs c2,r2 -o default.yaml       # 5+ pro
 metraj structural-feedback global-hints ./feedbacks/ -o hints.yaml      # auto signal_hints
 ```
 
-Aşağıdaki orijinal roadmap (1-11. bölümler), gelecek fazların temel referansı olarak korundu. Yapılan işlerin commit edilmiş haline § 12 ve § 13'den ulaşılır.
+Aşağıdaki orijinal roadmap (1-11. bölümler), gelecek fazların temel referansı olarak korundu. Yapılan işlerin commit edilmiş haline § 12, § 13, § 14'ten ulaşılır.
 
 ---
 
@@ -559,7 +570,9 @@ metraj config-wizard --preset geometry_half --preset-only -o yari.yaml
 metraj config-wizard --list-presets
 ```
 
-### 13.3 UI mantığı — kullanıcının ayarladığı parametreler
+### 13.3 UI mantığı — kullanıcının ayarladığı tüm parametreler
+
+Config-wizard **8 sekme** halinde sunar:
 
 | Sekme | CalcParams alanı | Anlaşılır etiket | Tipik değerler |
 |---|---|---|---|
@@ -580,8 +593,36 @@ metraj config-wizard --list-presets
 | **Parapet & Asansör** | `parapet_thickness_m` | "Parapet kalınlığı (m)" | 0.20 |
 | | `parapet_concrete_volume_fraction` | "Parapet beton hacim çarpanı" | 1.0 / 0.365 |
 | | `elevator_shaft_quantity_scale` | "Asansör şaftı çarpanı" | 1.0 (her ayrı) / 0.333 (toplu) |
+| | `elevator_extra_height_m` | "Asansör ek yükseklik (m)" | 1.45 |
+| | `chimney_height_m` | "Baca yüksekliği (m)" | 0.9 |
+| **Minha & Eksiltmeler** | `slab_opening_concrete_scale` | "Döşeme boşluk minha beton çarpanı" | 1.0 / 0.906 |
+| | `kolon_head_minha_scale` | "Kolon yerleri minha global" | 1.0 / 0.807 |
+| | `beam_join_minha_m` | "Kiriş birleşim minha (m)" | 0.135 |
+| | `beam_zemin_concrete_qty_scale` | "Zemin kiriş beton özel" | 1.0 / 0.434 |
+| **Çatı & Koruma** | `roof_slab_thickness_m` | "Çatı döşeme kalınlığı (m)" | 0.10 |
+| | `roof_protection_thickness_m` | "Çatı koruma betonu (m)" | 0.05 |
+| | `beam_height_m` | "Kiriş yüksekliği (m)" | 0.45 |
 
-Toplam **17 alan** kullanıcı kontrolünde. Saf geometri butonu hepsini 1.0'a; Yarı kesit hepsini 0.5'e set eder.
+**Toplam 26 alan** spinbox ile kullanıcı kontrolünde.
+
+#### Ek sekmeler
+
+**"Kat-bazli Ayarlar"** sekmesi — `QTableWidget` editör, dinamik satır ekle/sil:
+- `doseme_net_scale_by_floor_label` (örn. `"0,00": 1.04`, `"+2,85": 1.05`)
+- `doseme_concrete_net_scale_by_floor_label`
+- `beam_formwork_floor_scale`
+- `beam_concrete_floor_scale`
+- `parapet_formwork_floor_scale`
+- `beam_join_minha_floor_scale`
+- `kolon_head_minha_floor_scale`
+
+Combobox ile hangi alanı düzenlediği seçilir; tablo o alanın `{kat: çarpan}` sözlüğünü gösterir.
+
+**"Katman Override"** sekmesi — iki tablo:
+- **Include kind**: `katman_adı + ElementKind (combobox)` — autodetect'in yanlış sınıflandırdığı katmanları elle düzelt (`structural_layer_include_kind` YAML çıktısı).
+- **Exclude**: katman adı listesi — autodetect bulsa bile geometri çıkarılmaz (`structural_layer_exclude` YAML çıktısı).
+
+**Hızlı butonlar**: "Saf Geometri (hepsi 1.0)" / "Yarı Kesit (hepsi 0.5)" — sadece `fraction`/`scale` alanlarını etkiler, fiziksel boyutları (m) korur.
 
 ### 13.4 Doğrulama: saf geometri çıkışı
 
@@ -618,12 +659,114 @@ Sistem artık **iki bağımsız iş akışı**na sahip:
 
 ### 13.7 GUI ile sistemi yönetme
 
-Üç farklı UI giriş noktası:
+**§ 14 ile birlikte sihirbazlar ana pencereye entegre oldu** — kullanıcı tek pencere üzerinden tüm akışı yönetebilir. Üç giriş noktası:
 
-| Komut | Amaç |
+| Komut | Amaç | Bağlam |
+|---|---|---|
+| **`metraj ui`** | **Ana pencere** — sihirbazlar dahil her şey | Tavsiye edilen birincil giriş |
+| `metraj wizard` | Calibration Wizard standalone | Ana UI içinden de açılabilir |
+| `metraj config-wizard` | Config Wizard standalone | Ana UI içinden de açılabilir |
+
+`metraj ui` koşuldu mu kullanıcı tüm pipeline'ı GUI'den yönetebilir; sihirbazlar üst paneldeki butonlardan, çıktı tablo + Excel + 2D plan sekmelerinden alınır.
+
+---
+
+## 14. Ana UI Entegrasyonu (en yeni eklenti)
+
+**Motivasyon.** Faz 7'de eklenen `calibration_wizard` (Faz 4 sihirbazı) ve § 13'te eklenen `config-wizard` (Excel-bağımsız) **ayrı standalone CLI tool**'lar olarak çalışıyordu. Ana pencere (`metraj ui`) bunları bilmiyordu, kullanıcı sihirbaza ayrı bir komutla erişiyordu — bu mantıksızdı. **Bu eklenti, sihirbazları ana pencerenin doğal bir parçası yaptı.**
+
+### 14.1 Ne değişti
+
+**Önceki durum:**
+- `metraj ui` → ana pencere; yapısal config olarak **her zaman** paket içindeki `kumluca.yaml` kullanılırdı (hard-coded)
+- Kullanıcı farklı bir profil kullanmak istiyorsa `metraj run` CLI komutuyla `--structural-config` parametresi gerekiyordu
+- Sihirbazlar başka pencerelerde, ana UI ile bağlantısız
+
+**Yeni durum:**
+- Ana pencerede **yapısal profil paneli** (üst satır altında)
+- Aktif profil canlı görüntülenir, renk kodlu (gri = default, yeşil bold = aktif)
+- Sihirbazlar **butona basılarak** ana UI içinden açılır
+- Kapatıldığında oluşturulan/seçilen YAML otomatik aktif profil olur
+
+### 14.2 Eklenen dosya değişiklikleri
+
+| Dosya | Değişiklik |
 |---|---|
-| `metraj ui` | **Ana pencere** — DWG yükle, mod seç (auto/architectural/structural), çalıştır, sekmeler: mahal listesi, açıklıklar, icmal, 2D plan, yapısal özet, kalıp/beton, doğrulama, uyarılar |
-| `metraj wizard` | Kalibrasyon sihirbazı (Excel ile auto-fit) — 5 adımlı QDialog |
-| `metraj config-wizard` | Excel'siz config sihirbazı — 6 sekmeli QDialog |
+| [metraj/app/main_window.py](../metraj/app/main_window.py) | `MainWindow.__init__`: `_active_struct_profile_path: Optional[Path]` attribute. `_build_ui`: top bar altına "Yapısal Profil" satırı (label + 4 buton). 4 yeni handler: `_pick_profile_yaml`, `_open_config_wizard`, `_open_calibration_wizard`, `_reset_profile`. `_on_mode_changed`: mod yapısal/auto değilse profil paneli disable. `_struct_config_for_ui`: artık `_active_struct_profile_path` öncelikli (varsa onu yükler), sonra `kumluca.yaml` default. `_suggest_profile_output_path`: makul varsayılan yol üretir (CAD seçili ise `<cad>.profile.yaml`). |
 
-`metraj ui` koşuldu mu kullanıcı tüm pipeline'ı GUI'den yönetebilir; çıktı Excel + 2D görüntü + tablo sekmeleri olarak gösterilir.
+### 14.3 Üst panel — 4 buton
+
+| Buton | İşlev | Hangi sihirbazı / dialogu açar |
+|---|---|---|
+| **"YAML Yükle..."** | Diskten önceden hazırlanmış profil seç | `QFileDialog.getOpenFileName` |
+| **"Yeni Profil (UI)..."** | Excel-bağımsız config sihirbazı | `StructuralConfigDialog` (§ 13: 8 sekme + dict + override) |
+| **"Excel ile Kalibre Et..."** | Auto-fit sihirbazı | `CalibrationWizard` (Faz 4 v2: 5 adım; CAD ve referans pre-fill) |
+| **"Default'a Dön"** | Aktif profili sıfırla, kumluca.yaml'a dön | — |
+
+### 14.4 Davranış
+
+1. **Mod-bağlı enable/disable**: Yapısal veya Otomatik modda butonlar aktif; Mimari modda gri (mantıksal: mimari pipeline yapısal profil kullanmaz).
+2. **Pre-fill akışı**: Ana pencerede CAD seçilmişse calibration_wizard otomatik bu CAD ile açılır; referans Excel de pre-fill edilir (`validator_check` aktifse).
+3. **Dialog → aktif profil**: Sihirbazlardan biri `accept()` ile kapanırsa, yazdığı YAML yolu otomatik `_active_struct_profile_path`'a atanır → label renkli güncellenir.
+4. **Çalıştırma**: "Metraj Çalıştır" basıldığında `_struct_config_for_ui()` aktif profili (varsa) öncelikli yükler; yoksa kumluca.yaml default'u. Aktif profilin üzerine yine UI'daki katman override'lar (`structural_layer_include_kind`/`structural_layer_exclude`) ve referans Excel doğrulama merge edilir.
+5. **Varsayılan çıktı yolu**: CAD seçili ise yeni profil için varsayılan `<cad_klasoru>/<cad_adi>.profile.yaml`, aksi halde `<output_dir>/profile.yaml`.
+
+### 14.5 Kullanıcı senaryosu (uçtan uca, tek pencere)
+
+```
+1. metraj ui          → Ana pencere açıldı
+2. "DWG/DXF Seç..."   → proje.dxf
+3. "Çıktı Klasörü..." → ./build
+4. Mod: Yapısal
+5. Yapısal Profil paneli aktif oldu. Üç seçenek:
+
+   a) Excel'in var mı?
+      → "Excel ile Kalibre Et..." → CalibrationWizard 5 adımı
+         (CAD ve referans pre-fill; auto-fit + manuel ince ayar + test + kaydet)
+      → KALIP <%1, BETON <%10 ile profil hazır
+
+   b) Excel'in yok mu?
+      → "Yeni Profil (UI)..." → StructuralConfigDialog
+         (8 sekme: Kolon/Perde/Kiriş/Döşeme/Temel+Grobeton/Parapet+Asansör/Minha/Çatı)
+         + "Kat-bazli Ayarlar" sekmesi (dict editör)
+         + "Katman Override" sekmesi
+      → Kaydet → profil hazır
+
+   c) Hazır YAML'ın var?
+      → "YAML Yükle..." → file picker
+
+6. Profil label yeşil oldu: "proje.profile.yaml — Custom (geometry_half)"
+7. "Metraj Çalıştır"
+8. Sonuçlar 9 sekmede:
+   - 2D Plan        — duvar/mahal/eleman
+   - Mahal Listesi  — kat/kod/ad/alan
+   - Açıklıklar     — kapı/pencere
+   - İcmal          — poz toplamları
+   - Yapısal Özet   — HTML tablo
+   - Kalıp (m²)     — KALIP satırları
+   - Beton (m³)     — BETON satırları
+   - Yapısal Katmanlar — manual override
+   - Doğrulama      — referansa karşı sapma (varsa)
+   - Uyarılar       — autodetect mismatchleri
+9. Excel: ./build/yapisal_metraj.xlsx (generic layout)
+```
+
+### 14.6 Kümülatif Test ve Komut Özeti (Faz 0 → § 14)
+
+| Aşama | Test | Süre | CLI komut |
+|---|---:|---:|---:|
+| Faz 0 başlangıç | 21 | 4s | 6 |
+| Faz 7 (Calibration Wizard) | 139 | 47s | 16 |
+| Test stabilizasyonu + § 13 (Config Wizard) | 149 | 22s | 17 |
+| **§ 14 (Ana UI Entegrasyonu)** | **155** | **~25-35s** | **17** |
+
+CLI komut sayısı § 14'te artmadı çünkü entegrasyon ana UI içinde (yeni komut eklenmedi, mevcut sihirbazlar `metraj ui`'nin içine taşındı).
+
+### 14.7 Sonuç
+
+Sistem şu an **üç paralel yol** sunuyor:
+1. **Ana UI** (`metraj ui`) — kullanıcı arayüzü; sihirbazlar üst panel butonları
+2. **Standalone sihirbaz** (`metraj wizard`, `metraj config-wizard`) — tek-amaç GUI
+3. **Saf CLI** (`metraj structural-fit`, `metraj run --structural-config`, vb.) — script/CI
+
+İkisi de aynı `StructuralConfig` mekanizması; YAML çıktıları birbiriyle değiştirilebilir. **Ana UI birincil kullanıcı arayüzü** olarak konumlandırıldı.

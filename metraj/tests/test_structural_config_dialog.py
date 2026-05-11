@@ -79,13 +79,92 @@ def test_field_groups_cover_critical_calcparams_fields():
 
 
 def test_field_groups_include_main_categories():
-    """En az 5 grup: Kolon, Perde, Kiris, Doseme, Temel."""
+    """En az 5 grup: Kolon, Perde, Kiris, Doseme, Temel + Minha + Cati."""
     keys = list(FIELD_GROUPS.keys())
-    assert len(keys) >= 5
+    assert len(keys) >= 7  # Minha + Cati eklendi
     # Anahtar kelimeler en az bir grupta gecmeli
     s = " ".join(keys).upper()
-    for kw in ("KOLON", "PERDE", "KIRIS", "DOSEME"):
+    for kw in ("KOLON", "PERDE", "KIRIS", "DOSEME", "MINHA", "CATI"):
         assert kw in s, f"Grup eksik: {kw}"
+
+
+def test_minha_fields_in_dialog():
+    """Minha (eksiltme) alanlari UI'da yer almali."""
+    flat = field_groups_to_flat_list()
+    names = {f.name for f in flat}
+    for required in (
+        "slab_opening_concrete_scale",
+        "kolon_head_minha_scale",
+        "beam_join_minha_m",
+        "beam_zemin_concrete_qty_scale",
+    ):
+        assert required in names, f"UI'da eksik minha alani: {required}"
+
+
+def test_advanced_dimension_fields_in_dialog():
+    """Ileri boyut alanlari (cati, asansor, baca) UI'da olmali."""
+    flat = field_groups_to_flat_list()
+    names = {f.name for f in flat}
+    for required in (
+        "beam_height_m",
+        "roof_slab_thickness_m",
+        "roof_protection_thickness_m",
+        "elevator_extra_height_m",
+        "chimney_height_m",
+    ):
+        assert required in names, f"UI'da eksik ileri boyut alani: {required}"
+
+
+def test_geometry_full_preset_minha_fields():
+    """geometry_full preset minha alanlarini 1.0 olarak set etmeli."""
+    cp = load_method_preset("geometry_full")
+    assert cp.slab_opening_concrete_scale == pytest.approx(1.0)
+    assert cp.kolon_head_minha_scale == pytest.approx(1.0)
+    assert cp.beam_zemin_concrete_qty_scale == pytest.approx(1.0)
+
+
+def test_geometry_half_preset_minha_fields():
+    """geometry_half preset Kumluca-stili minha degerlerini icermeli."""
+    cp = load_method_preset("geometry_half")
+    assert cp.slab_opening_concrete_scale == pytest.approx(0.906)
+    assert cp.kolon_head_minha_scale == pytest.approx(0.807)
+    assert cp.beam_zemin_concrete_qty_scale == pytest.approx(0.434)
+
+
+def test_calcparams_to_yaml_includes_layer_overrides(tmp_path):
+    """structural_layer_include_kind ve structural_layer_exclude YAML'a yazilmali."""
+    cp = CalcParams()
+    out = tmp_path / "with_overrides.yaml"
+    calcparams_to_yaml(
+        cp, out,
+        structural_layer_include_kind={"K-30x60": "column", "P-A": "shear_wall"},
+        structural_layer_exclude=["IZ_KOLON_PRY"],
+    )
+    text = out.read_text(encoding="utf-8")
+    assert "structural_layer_include_kind" in text
+    assert "K-30x60" in text
+    assert "structural_layer_exclude" in text
+
+    from metraj.core.structural.config import StructuralConfig
+    cfg = StructuralConfig.from_file(out)
+    assert cfg.structural_layer_include_kind == {"K-30x60": "column", "P-A": "shear_wall"}
+    assert cfg.structural_layer_exclude == ["IZ_KOLON_PRY"]
+
+
+def test_calcparams_to_yaml_includes_dict_fields(tmp_path):
+    """Kat-bazli dict alanlari (doseme_net_scale_by_floor_label vb.) YAML'a yazilmali."""
+    cp = CalcParams(
+        slab_net_area_fraction=0.5,
+        doseme_net_scale_by_floor_label={"0,00": 1.04, "+2,85": 1.05},
+        beam_formwork_floor_scale={"+11,40": 1.69},
+    )
+    out = tmp_path / "dict_fields.yaml"
+    calcparams_to_yaml(cp, out)
+
+    from metraj.core.structural.config import StructuralConfig
+    cfg = StructuralConfig.from_file(out)
+    assert cfg.params.doseme_net_scale_by_floor_label == {"0,00": 1.04, "+2,85": 1.05}
+    assert cfg.params.beam_formwork_floor_scale == {"+11,40": 1.69}
 
 
 def test_preset_dump_round_trip_via_yaml(tmp_path):
